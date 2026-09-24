@@ -435,128 +435,405 @@ section > div{
 @media(max-width:760px){.wisePaymentGrid{grid-template-columns:1fr}.wiseQrWrap{width:176px;margin:0 auto}}
 
 
-/* CHECKOUT UI ONLY — one full-screen page per step; no checkout scrolling */
-.checkoutBackdrop{
-  padding:0;
-  place-items:stretch;
+/* FINAL CHECKOUT RESPONSIVE PATCH — checkout UI only. No other site UI is changed. */
+html.checkout-active,
+html.checkout-active body{
+  overflow:hidden !important;
+  overscroll-behavior:none;
 }
+
+.checkoutBackdrop{
+  position:fixed;
+  inset:0;
+  z-index:999;
+  padding:0;
+  display:grid;
+  place-items:stretch;
+  overflow:hidden;
+  background:rgba(0,0,0,.58);
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+}
+
 .checkoutCard{
-  width:100vw;
+  position:relative;
+  width:100%;
   max-width:none;
-  height:100dvh;
-  max-height:none;
+  height:var(--reachx-checkout-vh,100dvh);
+  max-height:var(--reachx-checkout-vh,100dvh);
+  min-width:0;
+  min-height:0;
   overflow:hidden;
   border:0;
   border-radius:0;
-  padding:max(22px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left));
+  padding:max(24px,env(safe-area-inset-top)) max(28px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(28px,env(safe-area-inset-left));
+  background:rgba(5,7,14,.88);
+  box-shadow:none;
   display:flex;
   flex-direction:column;
+  isolation:isolate;
 }
-.checkoutHeader{flex:0 0 auto}
-.checkoutSteps{flex:0 0 auto}
-.checkoutPage{
+
+.checkoutHeader{
+  flex:0 0 auto;
+  min-width:0;
+}
+.checkoutHeader > div{min-width:0}
+.checkoutHeader .modalTitle{
+  max-width:calc(100vw - 100px);
+  overflow-wrap:anywhere;
+}
+.checkoutHeader .modalClose{flex:0 0 auto}
+
+.checkoutSteps{
+  flex:0 0 auto;
+  min-width:0;
+  margin:16px 0 20px;
+}
+.checkoutStep{min-width:0}
+
+.checkoutPage[hidden]{display:none !important}
+.checkoutPage:not([hidden]){
+  display:flex !important;
   flex:1 1 auto;
+  flex-direction:column;
+  width:100%;
+  min-width:0;
   min-height:0;
   overflow:hidden;
-  display:flex;
-  flex-direction:column;
 }
-.checkoutPage[hidden]{display:none!important}
-.checkoutGrid{
+
+.checkoutPage > .checkoutGrid{
   flex:1 1 auto;
+  width:100%;
+  min-width:0;
   min-height:0;
-  align-items:stretch;
-}
-.checkoutPanel{min-height:0}
-.checkoutForm{gap:9px}
-.checkoutForm input,.checkoutForm select{padding:11px 13px}
-.checkoutActions{margin-top:14px}
-
-@media(max-width:760px){
-  .checkoutCard{
-    padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
-  }
-  .checkoutHeader .modalTitle{font-size:clamp(30px,8vw,52px);margin-bottom:10px}
-  .checkoutSteps{margin:12px 0 14px;gap:6px}
-  .checkoutStep{padding:7px 9px;font-size:8px}
-  .checkoutGrid{gap:10px}
-  .checkoutPanel{padding:14px}
-  .checkoutPanel h3{font-size:11px;margin-bottom:10px}
-  .checkoutForm{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .checkoutForm .full{grid-column:1/-1}
-  .checkoutForm input,.checkoutForm select{padding:10px 11px;font-size:13px}
-  .checkoutPlans{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .billingOption{padding:10px}
-  .billingOption b{font-size:10px}
-  .billingOption span{font-size:10px;line-height:1.35}
-  .checkoutNote{font-size:10px;line-height:1.45;margin-top:10px}
-  .checkoutActions{gap:8px;margin-top:10px}
-  .checkoutActions .btn{min-height:42px;padding:11px 15px}
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(260px,340px);
+  gap:18px;
+  overflow:hidden;
 }
 
-@media(max-width:430px){
-  .checkoutForm{grid-template-columns:1fr}
-  .checkoutForm .full{grid-column:auto}
-  .checkoutForm input,.checkoutForm select{padding:9px 10px}
-  .checkoutPanel{padding:12px}
-  .checkoutSummary{gap:6px}
-  .summaryRow{font-size:11px}
-  .checkoutSteps{margin-bottom:10px}
-}
-
-
-
-/* PAYMENT UI SAFETY PATCH — prevents overlap/clipping across desktop, tablet and mobile. */
-.checkoutStep3,
-.checkoutStep3 .checkoutGrid,
-.checkoutStep3 .checkoutPanel,
+.checkoutGrid > *,
+.checkoutPanel,
+.checkoutForm,
+.checkoutPlans,
+.checkoutSummary,
+.checkoutActions,
 .wisePaymentBox,
-.wisePaymentTop,
 .wisePaymentGrid,
-.wisePaymentGrid > div,
-.wisePaymentNote,
-.wisePayButton,
-.wiseQrWrap{
+.wisePaymentGrid > *{
   min-width:0;
   box-sizing:border-box;
 }
 
-.checkoutStep3 .checkoutGrid{width:100%;}
-.checkoutStep3 .checkoutPanel{overflow:hidden;}
-.wisePaymentBox{width:100%;max-width:100%;overflow:hidden;}
-.wisePaymentTop > *{min-width:0;}
-.wisePaymentGrid{grid-template-columns:minmax(0,1fr) minmax(150px,190px);}
-.wisePaymentNote{max-width:100%;overflow-wrap:anywhere;word-break:normal;}
-.wiseQrWrap{width:min(190px,100%);aspect-ratio:1 / 1;margin-inline:auto;padding:clamp(8px,1.2vw,12px);}
-.wiseQr{width:100%;height:100%;max-width:100%;max-height:100%;aspect-ratio:1 / 1;object-fit:contain;}
-.wisePayButton{min-width:0;flex-wrap:wrap;}
-.wisePayButton .btn{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;}
-
-@media(max-width:760px){
-  .checkoutStep3 .checkoutGrid{grid-template-columns:minmax(0,1fr);}
-  .wisePaymentGrid{grid-template-columns:minmax(0,1fr) minmax(120px,150px);gap:12px;align-items:center;}
-  .wiseQrWrap{width:min(150px,100%);}
-  .wisePaymentBox{padding:14px;}
-  .wisePaymentNote{font-size:clamp(10px,2.8vw,11px);line-height:1.55;}
+.checkoutPanel{
+  min-height:0;
+  overflow:hidden;
+}
+.checkoutForm input,
+.checkoutForm select{
+  max-width:100%;
+}
+.summaryRow strong{
+  min-width:0;
+  overflow-wrap:anywhere;
+  word-break:break-word;
 }
 
-@media(max-width:560px){
-  .wisePaymentGrid{grid-template-columns:1fr;justify-items:stretch;}
-  .wiseQrWrap{width:min(132px,42vw);justify-self:center;}
-  .wisePayButton{justify-content:center;}
-  .wisePayButton .btn{flex:1 1 150px;}
+/* Desktop/tablet payment layout */
+#checkoutStep3 .wisePaymentGrid{
+  grid-template-columns:minmax(0,1fr) minmax(170px,210px);
+  gap:18px;
+  align-items:center;
+}
+#checkoutStep3 .wisePaymentGrid > div:first-child{
+  min-width:0;
+}
+#checkoutStep3 .wisePaymentNote{
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+#checkoutStep3 .wiseQrWrap{
+  width:min(190px,100%);
+  height:min(190px,100%);
+  min-width:0;
+  min-height:0;
+  aspect-ratio:1/1;
+  margin-inline:auto;
+}
+#checkoutStep3 .wiseQr{
+  width:100%;
+  height:100%;
+  max-width:100%;
+  max-height:100%;
+  aspect-ratio:1/1;
+  display:block;
+  object-fit:contain;
 }
 
-@media(max-height:900px) and (min-width:561px){
-  .checkoutHeader .modalTitle{font-size:clamp(30px,5vw,52px);margin-bottom:8px;}
-  .checkoutSteps{margin:10px 0 12px;}
-  .wisePaymentBox{padding:12px;margin-top:8px;}
-  .wisePaymentGrid{margin-top:10px;gap:12px;}
-  .wisePaymentNote{font-size:10px;line-height:1.45;}
-  .wiseQrWrap{width:min(150px,100%);}
-  .wisePayButton{margin-top:9px;}
+/* Touch/tablet/mobile: switch the checkout itself to the device viewport. */
+@media (max-width: 900px), (pointer:coarse){
+  .checkoutCard{
+    height:var(--reachx-checkout-vh,100dvh);
+    max-height:var(--reachx-checkout-vh,100dvh);
+    padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+    background:rgba(5,7,14,.86);
+  }
+  .checkoutHeader .modalTitle{
+    font-size:clamp(26px,6.5vw,44px);
+    line-height:.92;
+    margin:4px 0 0;
+  }
+  .checkoutSteps{
+    margin:10px 0 12px;
+    gap:6px;
+  }
+  .checkoutStep{
+    flex:1 1 0;
+    text-align:center;
+    padding:7px 8px;
+    font-size:8px;
+    line-height:1;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .checkoutPage > .checkoutGrid{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:minmax(0,1fr) auto;
+    gap:8px;
+  }
+  .checkoutPanel{padding:12px}
+  .checkoutPanel h3{font-size:10px;margin-bottom:8px}
+
+  /* Step 1: keep the five fields, billing choice, summary and CTA inside one stable viewport. */
+  #checkoutStep1 .checkoutGrid > .checkoutPanel:first-child{
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  #checkoutStep1 .checkoutPlans{
+    flex:0 0 auto;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+  }
+  #checkoutStep1 .billingOption{
+    padding:9px;
+    min-width:0;
+  }
+  #checkoutStep1 .billingOption b{font-size:9px}
+  #checkoutStep1 .billingOption span{font-size:9px;line-height:1.25}
+  #checkoutStep1 .checkoutForm{
+    flex:0 0 auto;
+    grid-template-columns:1fr;
+    gap:6px;
+  }
+  #checkoutStep1 .checkoutForm input,
+  #checkoutStep1 .checkoutForm select{
+    width:100%;
+    height:40px;
+    min-height:40px;
+    padding:8px 10px;
+    font-size:16px;
+    line-height:1.2;
+  }
+  #checkoutStep1 .checkoutForm .full{grid-column:auto}
+  #checkoutStep1 .checkoutGrid > aside{
+    height:auto;
+    min-height:0;
+    padding:10px;
+  }
+  #checkoutStep1 .checkoutSummary{gap:4px}
+  #checkoutStep1 .summaryRow{font-size:10px;line-height:1.2}
+  #checkoutStep1 .checkoutNote{font-size:8.5px;line-height:1.3;margin-top:5px}
+  #checkoutStep1 .checkoutActions{margin-top:7px}
+  #checkoutStep1 .checkoutActions .btn{width:100%;min-height:40px;padding:9px 12px;font-size:8.5px}
+
+  /* Step 2: stable review, no content collision. */
+  #checkoutStep2 .checkoutPanel:first-child{
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  #checkoutStep2 #reviewCustomer{gap:5px}
+  #checkoutStep2 #reviewCustomer .summaryRow{font-size:10px;line-height:1.2}
+  #checkoutStep2 #reviewDetails{
+    margin-top:8px;
+    font-size:9px;
+    line-height:1.35;
+    overflow:hidden;
+    overflow-wrap:anywhere;
+  }
+  #checkoutStep2 .checkoutActions{
+    margin-top:auto;
+    padding-top:10px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+  }
+  #checkoutStep2 .checkoutActions .btn{width:100%;min-height:40px;padding:9px 7px;font-size:8.5px}
+  #checkoutStep2 .checkoutGrid > aside{height:auto;min-height:0;padding:10px}
+  #checkoutStep2 .checkoutGrid > aside .summaryRow{font-size:10px;line-height:1.2}
+
+  /* Step 3: QR and copy have dedicated space; the order summary is separate. */
+  #checkoutStep3 .checkoutPanel:first-child{
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  #checkoutStep3 .wisePaymentBox{
+    flex:1 1 auto;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    padding:12px !important;
+    margin:0 !important;
+    overflow:hidden;
+  }
+  #checkoutStep3 .wisePaymentTop{flex:0 0 auto}
+  #checkoutStep3 .wiseBrand{
+    font-size:clamp(11px,3.7vw,14px) !important;
+    line-height:1.1 !important;
+    letter-spacing:.10em !important;
+    overflow-wrap:anywhere;
+  }
+  #checkoutStep3 .wiseAmount{
+    margin-top:7px;
+    font-size:clamp(17px,5.5vw,24px) !important;
+    line-height:1.15 !important;
+    overflow-wrap:anywhere;
+  }
+  #checkoutStep3 .wisePaymentGrid{
+    flex:1 1 auto;
+    min-height:0;
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) minmax(96px,124px) !important;
+    gap:10px !important;
+    align-items:center !important;
+    margin-top:10px !important;
+    overflow:hidden;
+  }
+  #checkoutStep3 .wisePaymentGrid > div:first-child{
+    min-width:0;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    overflow:hidden;
+  }
+  #checkoutStep3 .wisePaymentNote{
+    font-size:clamp(9px,2.7vw,10.5px) !important;
+    line-height:1.32 !important;
+    overflow-wrap:anywhere;
+  }
+  #checkoutStep3 .wisePaymentNote strong{font-size:clamp(9.5px,2.9vw,11px) !important}
+  #checkoutStep3 .wisePayButton{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) minmax(74px,.65fr);
+    gap:7px !important;
+    margin-top:9px !important;
+  }
+  #checkoutStep3 .wisePayButton .btn{
+    width:100%;
+    min-width:0;
+    min-height:40px;
+    padding:9px 7px !important;
+    font-size:8px !important;
+    line-height:1.15;
+    letter-spacing:.08em !important;
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+  #checkoutStep3 .wiseQrWrap{
+    width:124px !important;
+    height:124px !important;
+    max-width:124px;
+    max-height:124px;
+    aspect-ratio:1/1;
+    padding:6px !important;
+    margin:0 auto !important;
+    border-radius:12px !important;
+  }
+  #checkoutStep3 .wiseQr{width:100% !important;height:100% !important;max-width:100%;max-height:100%;aspect-ratio:1/1;display:block}
+  #checkoutStep3 .checkoutGrid > aside{
+    height:auto;
+    min-height:0;
+    padding:9px 10px;
+    overflow:hidden;
+  }
+  #checkoutStep3 .checkoutGrid > aside h3{font-size:9px;margin-bottom:5px}
+  #checkoutStep3 .checkoutGrid > aside .checkoutSummary{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:6px;
+  }
+  #checkoutStep3 .checkoutGrid > aside .summaryRow{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:1px;
+    font-size:8.5px;
+    line-height:1.15;
+  }
+  #checkoutStep3 .checkoutGrid > aside .summaryRow strong{
+    font-size:9px;
+    text-align:left;
+    overflow-wrap:anywhere;
+  }
+  #checkoutStep3 .checkoutGrid > aside .checkoutNote{font-size:7.5px;line-height:1.2;margin-top:5px}
 }
 
+/* Very small phones: stack the payment copy and QR instead of squeezing them together. */
+@media (max-width:430px){
+  .checkoutCard{
+    padding-left:max(9px,env(safe-area-inset-left));
+    padding-right:max(9px,env(safe-area-inset-right));
+  }
+  #checkoutStep1 .checkoutForm input,
+  #checkoutStep1 .checkoutForm select{
+    height:38px;
+    min-height:38px;
+    font-size:16px;
+  }
+  #checkoutStep3 .wisePaymentGrid{
+    grid-template-columns:1fr !important;
+    grid-template-rows:auto auto !important;
+    overflow:hidden;
+  }
+  #checkoutStep3 .wisePaymentGrid > div:first-child{overflow:visible}
+  #checkoutStep3 .wiseQrWrap{
+    width:88px !important;
+    height:88px !important;
+    min-width:88px;
+    min-height:88px;
+    max-width:88px;
+    max-height:88px;
+    justify-self:center;
+  }
+  #checkoutStep3 .wisePayButton{
+    grid-template-columns:minmax(0,1fr) minmax(78px,.7fr);
+  }
+  #checkoutStep3 .wisePaymentNote{
+    font-size:9px !important;
+    line-height:1.25 !important;
+  }
+}
+
+/* Extra-short mobile screens: tighten only checkout spacing, never the main site. */
+@media (max-width:760px) and (max-height:700px){
+  .checkoutCard{padding-top:max(9px,env(safe-area-inset-top));padding-bottom:max(9px,env(safe-area-inset-bottom));}
+  .checkoutSteps{margin:6px 0 8px}
+  #checkoutStep1 .checkoutForm{gap:5px}
+  #checkoutStep1 .checkoutForm input,
+  #checkoutStep1 .checkoutForm select{height:35px;min-height:35px}
+  #checkoutStep3 .wisePaymentGrid{margin-top:7px !important}
+  #checkoutStep3 .wisePayButton{margin-top:6px !important}
+}
+
+@media (prefers-reduced-motion:reduce), (max-width:900px), (pointer:coarse){
+  .checkoutBackdrop,.checkoutBackdrop.open{transition:none !important;}
+}
 </style>
 
 <meta name="robots" content="index,follow">
@@ -572,7 +849,11 @@ section > div{
 <link rel="canonical" href="https://reachx.shop/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext x='8' y='51' font-size='48'%3E⚡%3C/text%3E%3C/svg%3E">
 
-<noscript><style>#webgl,#vignette,#grain{display:none!important}</style></noscript>
+<noscript><style>#webgl,#vignette,#grain{display:none!important}</style>
+
+
+</noscript>
+
 </head>
 <body>
 <canvas id="webgl" aria-hidden="true"></canvas>
@@ -1653,6 +1934,21 @@ const billingOptions=document.getElementById('billingOptions');
 const checkoutForm=document.getElementById('checkoutForm');
 const checkoutPages=[document.getElementById('checkoutStep1'),document.getElementById('checkoutStep2'),document.getElementById('checkoutStep3'),document.getElementById('checkoutRequestSent')];
 const checkoutPills=[...document.querySelectorAll('[data-step-pill]')];
+
+// Checkout-only device/viewport sync. This does not alter the site's main animation or layout.
+function syncCheckoutViewport(){
+  const vv=window.visualViewport;
+  const h=Math.max(1,Math.round(vv ? vv.height : window.innerHeight));
+  const w=Math.max(1,Math.round(vv ? vv.width : window.innerWidth));
+  const coarse=matchMedia('(pointer:coarse)').matches;
+  const mode=(coarse || w<=760) ? (w<=430 ? 'phone' : 'tablet') : (w<=1100 ? 'laptop' : 'desktop');
+  document.documentElement.style.setProperty('--reachx-checkout-vh',h+'px');
+  document.documentElement.dataset.checkoutDevice=mode;
+}
+syncCheckoutViewport();
+addEventListener('resize',syncCheckoutViewport,{passive:true});
+if(window.visualViewport) window.visualViewport.addEventListener('resize',syncCheckoutViewport,{passive:true});
+window.addEventListener('orientationchange',()=>setTimeout(syncCheckoutViewport,80),{passive:true});
 let checkoutPlan={name:'',oneMonth:0,threeMonth:0,desc:'',items:[]};
 let checkoutBilling='3';
 let checkoutCustomer={};
@@ -1720,12 +2016,14 @@ function openCheckout(){
   showCheckoutStep(1);
   checkoutBackdrop.classList.add('open');
   checkoutBackdrop.setAttribute('aria-hidden','false');
+  document.documentElement.classList.add('checkout-active');
   document.body.style.overflow='hidden';
 }
 
 function closeCheckout(){
   checkoutBackdrop.classList.remove('open');
   checkoutBackdrop.setAttribute('aria-hidden','true');
+  document.documentElement.classList.remove('checkout-active');
   document.body.style.overflow='';
 }
 
