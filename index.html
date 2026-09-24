@@ -420,6 +420,143 @@ section > div{
 .checkoutSuccess{border:1px solid rgba(137,255,182,.24);background:rgba(70,255,145,.035);border-radius:18px;padding:22px}
 @media(max-width:760px){.checkoutGrid{grid-template-columns:1fr}.checkoutForm{grid-template-columns:1fr}.checkoutForm .full{grid-column:auto}.checkoutCard{padding:20px}.checkoutPlans{grid-template-columns:1fr}}
 
+
+/* Wise payment display — payment method only */
+.wisePaymentBox{border:1px solid rgba(255,220,120,.22);border-radius:18px;padding:18px;background:rgba(255,220,120,.025);margin-top:12px}
+.wisePaymentTop{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.wiseBrand{font-size:13px;font-weight:750;letter-spacing:.14em;color:#fff1c7}
+.wiseAmount{font-size:12px;color:#fff5d2}
+.wisePaymentGrid{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:18px;align-items:center;margin-top:16px}
+.wiseQrWrap{display:grid;place-items:center;padding:10px;border-radius:14px;background:#fff;border:1px solid rgba(255,255,255,.25)}
+.wiseQr{display:block;width:150px;height:150px;max-width:100%;object-fit:contain}
+.wisePaymentNote{font-size:11px;line-height:1.7;color:#9da6b5}
+.wisePaymentNote strong{color:#fff1c7}
+.wisePayButton{margin-top:14px}
+@media(max-width:760px){.wisePaymentGrid{grid-template-columns:1fr}.wiseQrWrap{width:176px;margin:0 auto}}
+
+
+/* CHECKOUT UI ONLY — one full-screen page per step; no checkout scrolling */
+.checkoutBackdrop{
+  padding:0;
+  place-items:stretch;
+}
+.checkoutCard{
+  width:100vw;
+  max-width:none;
+  height:100dvh;
+  max-height:none;
+  overflow:hidden;
+  border:0;
+  border-radius:0;
+  padding:max(22px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left));
+  display:flex;
+  flex-direction:column;
+}
+.checkoutHeader{flex:0 0 auto}
+.checkoutSteps{flex:0 0 auto}
+.checkoutPage{
+  flex:1 1 auto;
+  min-height:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+.checkoutPage[hidden]{display:none!important}
+.checkoutGrid{
+  flex:1 1 auto;
+  min-height:0;
+  align-items:stretch;
+}
+.checkoutPanel{min-height:0}
+.checkoutForm{gap:9px}
+.checkoutForm input,.checkoutForm select{padding:11px 13px}
+.checkoutActions{margin-top:14px}
+
+@media(max-width:760px){
+  .checkoutCard{
+    padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+  }
+  .checkoutHeader .modalTitle{font-size:clamp(30px,8vw,52px);margin-bottom:10px}
+  .checkoutSteps{margin:12px 0 14px;gap:6px}
+  .checkoutStep{padding:7px 9px;font-size:8px}
+  .checkoutGrid{gap:10px}
+  .checkoutPanel{padding:14px}
+  .checkoutPanel h3{font-size:11px;margin-bottom:10px}
+  .checkoutForm{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .checkoutForm .full{grid-column:1/-1}
+  .checkoutForm input,.checkoutForm select{padding:10px 11px;font-size:13px}
+  .checkoutPlans{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .billingOption{padding:10px}
+  .billingOption b{font-size:10px}
+  .billingOption span{font-size:10px;line-height:1.35}
+  .checkoutNote{font-size:10px;line-height:1.45;margin-top:10px}
+  .checkoutActions{gap:8px;margin-top:10px}
+  .checkoutActions .btn{min-height:42px;padding:11px 15px}
+}
+
+@media(max-width:430px){
+  .checkoutForm{grid-template-columns:1fr}
+  .checkoutForm .full{grid-column:auto}
+  .checkoutForm input,.checkoutForm select{padding:9px 10px}
+  .checkoutPanel{padding:12px}
+  .checkoutSummary{gap:6px}
+  .summaryRow{font-size:11px}
+  .checkoutSteps{margin-bottom:10px}
+}
+
+
+
+/* PAYMENT UI SAFETY PATCH — prevents overlap/clipping across desktop, tablet and mobile. */
+.checkoutStep3,
+.checkoutStep3 .checkoutGrid,
+.checkoutStep3 .checkoutPanel,
+.wisePaymentBox,
+.wisePaymentTop,
+.wisePaymentGrid,
+.wisePaymentGrid > div,
+.wisePaymentNote,
+.wisePayButton,
+.wiseQrWrap{
+  min-width:0;
+  box-sizing:border-box;
+}
+
+.checkoutStep3 .checkoutGrid{width:100%;}
+.checkoutStep3 .checkoutPanel{overflow:hidden;}
+.wisePaymentBox{width:100%;max-width:100%;overflow:hidden;}
+.wisePaymentTop > *{min-width:0;}
+.wisePaymentGrid{grid-template-columns:minmax(0,1fr) minmax(150px,190px);}
+.wisePaymentNote{max-width:100%;overflow-wrap:anywhere;word-break:normal;}
+.wiseQrWrap{width:min(190px,100%);aspect-ratio:1 / 1;margin-inline:auto;padding:clamp(8px,1.2vw,12px);}
+.wiseQr{width:100%;height:100%;max-width:100%;max-height:100%;aspect-ratio:1 / 1;object-fit:contain;}
+.wisePayButton{min-width:0;flex-wrap:wrap;}
+.wisePayButton .btn{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;}
+
+@media(max-width:760px){
+  .checkoutStep3 .checkoutGrid{grid-template-columns:minmax(0,1fr);}
+  .wisePaymentGrid{grid-template-columns:minmax(0,1fr) minmax(120px,150px);gap:12px;align-items:center;}
+  .wiseQrWrap{width:min(150px,100%);}
+  .wisePaymentBox{padding:14px;}
+  .wisePaymentNote{font-size:clamp(10px,2.8vw,11px);line-height:1.55;}
+}
+
+@media(max-width:560px){
+  .wisePaymentGrid{grid-template-columns:1fr;justify-items:stretch;}
+  .wiseQrWrap{width:min(132px,42vw);justify-self:center;}
+  .wisePayButton{justify-content:center;}
+  .wisePayButton .btn{flex:1 1 150px;}
+}
+
+@media(max-height:900px) and (min-width:561px){
+  .checkoutHeader .modalTitle{font-size:clamp(30px,5vw,52px);margin-bottom:8px;}
+  .checkoutSteps{margin:10px 0 12px;}
+  .wisePaymentBox{padding:12px;margin-top:8px;}
+  .wisePaymentGrid{margin-top:10px;gap:12px;}
+  .wisePaymentNote{font-size:10px;line-height:1.45;}
+  .wiseQrWrap{width:min(150px,100%);}
+  .wisePayButton{margin-top:9px;}
+}
+
 </style>
 
 <meta name="robots" content="index,follow">
@@ -646,6 +783,153 @@ section > div{
 
 
 <footer><div>© 2026 REACH X · ALL RIGHTS RESERVED</div><div>WEB DEVELOPMENT · DIGITAL MARKETING · GROWTH</div></footer>
+
+
+
+<div class="modalBackdrop" id="planModal" aria-hidden="true">
+  <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="planModalTitle">
+    <button class="modalClose" id="planModalClose" type="button" aria-label="Close">×</button>
+    <div class="eyebrow">REACH X PLAN</div>
+    <div class="modalTitle" id="planModalTitle">Plan</div>
+    <div class="planModalPrice" id="planModalPrice">$999 / month | 3 months: $799 / month</div>
+    <div class="modalBody" id="planModalBody">Details</div>
+    <div class="modalList" id="planModalList"></div>
+    <div class="actions" style="justify-content:flex-start;margin-top:24px">
+      <button class="btn primary" id="planModalCta" type="button">Choose this plan →</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="checkoutBackdrop" id="checkoutBackdrop" aria-hidden="true">
+  <div class="checkoutCard" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+    <div class="checkoutHeader">
+      <div>
+        <div class="eyebrow">REACH X CHECKOUT</div>
+        <div class="modalTitle" id="checkoutTitle">Complete your order</div>
+      </div>
+      <button class="modalClose" id="checkoutClose" type="button" aria-label="Close checkout">×</button>
+    </div>
+
+    <div class="checkoutSteps" aria-label="Checkout steps">
+      <div class="checkoutStep active" data-step-pill="1">1 · Details</div>
+      <div class="checkoutStep" data-step-pill="2">2 · Review</div>
+      <div class="checkoutStep" data-step-pill="3">3 · Payment</div>
+    </div>
+
+    <section class="checkoutPage" id="checkoutStep1">
+      <div class="checkoutGrid">
+        <div class="checkoutPanel">
+          <h3>Choose your billing</h3>
+          <div class="checkoutPlans" id="billingOptions"></div>
+
+          <h3 style="margin-top:20px">Customer details</h3>
+          <form class="checkoutForm" id="checkoutForm">
+            <input name="fullName" type="text" placeholder="Full name" autocomplete="name" required>
+            <input name="business" type="text" placeholder="Business / company" autocomplete="organization" required>
+            <input name="email" type="email" placeholder="Email address" autocomplete="email" required>
+            <input name="phone" type="tel" placeholder="WhatsApp / phone" autocomplete="tel" required>
+            <input class="full" name="country" type="text" placeholder="Country" autocomplete="country-name" required>
+          </form>
+        </div>
+
+        <aside class="checkoutPanel">
+          <h3>Order summary</h3>
+          <div class="checkoutSummary">
+            <div class="summaryRow"><span>Plan</span><strong id="summaryPlan">—</strong></div>
+            <div class="summaryRow"><span>Billing</span><strong id="summaryBilling">—</strong></div>
+            <div class="summaryRow"><span>Price</span><strong id="summaryPrice">—</strong></div>
+          </div>
+          <div class="checkoutNote" id="summaryNote"></div>
+          <div class="checkoutActions">
+            <button class="btn primary" id="checkoutToReview" type="button">Review order →</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="checkoutPage" id="checkoutStep2" hidden>
+      <div class="checkoutGrid">
+        <div class="checkoutPanel">
+          <h3>Review your order</h3>
+          <div class="checkoutSummary" id="reviewCustomer"></div>
+          <div class="checkoutNote" id="reviewDetails"></div>
+          <div class="checkoutActions">
+            <button class="btn" id="checkoutBack1" type="button">← Back</button>
+            <button class="btn primary" id="checkoutToPayment" type="button">Proceed to payment →</button>
+          </div>
+        </div>
+        <aside class="checkoutPanel">
+          <h3>Final amount</h3>
+          <div class="summaryRow"><span>Plan</span><strong id="reviewPlan">—</strong></div>
+          <div class="summaryRow" style="margin-top:10px"><span>Billing</span><strong id="reviewBilling">—</strong></div>
+          <div class="summaryRow" style="margin-top:10px"><span>Total</span><strong id="reviewPrice">—</strong></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="checkoutPage" id="checkoutStep3" hidden>
+      <div class="checkoutGrid">
+        <div class="checkoutPanel">
+          <h3>Payment</h3>
+          <div class="wisePaymentBox">
+            <div class="wisePaymentTop">
+              <div class="wiseBrand">PAY SECURELY WITH WISE</div>
+              <div class="wiseAmount" id="wiseAmount">—</div>
+            </div>
+            <div class="wisePaymentGrid">
+              <div>
+                <div class="wisePaymentNote">
+                  <strong>Pay directly through Wise.</strong><br>
+                  You do not need the Wise app installed on this device. On a MacBook, laptop, iPad or desktop, simply scan the QR code with your phone camera. The QR code automatically matches the exact plan and billing period you selected.
+                </div>
+                <div class="checkoutActions wisePayButton">
+                  <button class="btn primary" id="payWithWise" type="button">Open Wise payment →</button>
+                  <button class="btn" id="checkoutBack2" type="button">← Back</button>
+                </div>
+              </div>
+              <div class="wiseQrWrap">
+                <img class="wiseQr" id="wiseQr" alt="QR code for the selected Wise payment" decoding="async">
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="checkoutPanel">
+          <h3>Order summary</h3>
+          <div class="checkoutSummary">
+            <div class="summaryRow"><span>Plan</span><strong id="paymentPlan">—</strong></div>
+            <div class="summaryRow"><span>Billing</span><strong id="paymentBilling">—</strong></div>
+            <div class="summaryRow"><span>Total</span><strong id="paymentPrice">—</strong></div>
+          </div>
+          <div class="checkoutNote">The QR code and Wise button both use the payment link assigned to this exact plan and billing period.</div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="checkoutPage" id="checkoutRequestSent" hidden>
+      <div class="checkoutSuccess">
+        <div class="eyebrow">REQUEST SENT</div>
+        <div class="modalTitle" style="font-size:clamp(30px,5vw,56px);margin-bottom:12px">Payment link requested</div>
+        <div class="modalBody">Your selected plan and customer details have been prepared for Reach X. Your email client will open so the request can be sent directly to reachx.shop@gmail.com</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="modalBackdrop" id="serviceModal" aria-hidden="true">
+  <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modalClose" id="modalClose" type="button" aria-label="Close">×</button>
+    <div class="eyebrow" id="modalEyebrow">REACH X SERVICE</div>
+    <div class="modalTitle" id="modalTitle">Service</div>
+    <div class="modalBody" id="modalBody">Details</div>
+    <div class="modalList" id="modalList"></div>
+    <div class="actions" style="justify-content:flex-start;margin-top:24px">
+      <a class="btn primary" id="modalCta" href="mailto:reachx.shop@gmail.com?subject=Reach%20X%20Service%20Enquiry">Discuss this service →</a>
+    </div>
+  </div>
+</div>
+
+<a class="whatsapp" href="https://wa.me/18268886971" target="_blank" rel="noopener" aria-label="Connect us instantly on WhatsApp"><span class="waSpark" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" focusable="false" aria-hidden="true"><path d="M20.5 3.5A10.8 10.8 0 0 0 12.02 0C5.99 0 1.08 4.91 1.08 10.94c0 1.93.5 3.82 1.46 5.48L1 24l7.74-1.5a10.88 10.88 0 0 0 3.28.5h.01c6.03 0 10.94-4.91 10.94-10.94 0-2.92-1.14-5.67-3.47-8.56ZM12.03 21.02h-.01a9.05 9.05 0 0 1-2.92-.48l-.21-.07-4.6.89.92-4.48-.07-.23a9.02 9.02 0 1 1 6.89 4.37Zm4.95-6.78c-.27-.14-1.62-.8-1.87-.89-.25-.09-.43-.14-.61.14-.18.27-.7.89-.86 1.08-.16.18-.32.2-.59.07-.27-.14-1.13-.42-2.15-1.34-.8-.71-1.34-1.58-1.5-1.84-.16-.27-.02-.41.12-.55.13-.13.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.52-.45-.45-.61-.46h-.52c-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.27s.98 2.63 1.11 2.81c.14.18 1.92 2.94 4.65 4.12.65.28 1.16.45 1.56.58.66.21 1.26.18 1.74.11.53-.08 1.62-.66 1.85-1.3.23-.64.23-1.19.16-1.3-.07-.12-.25-.18-.52-.32Z"/></svg></span><span class="waText">Connect us instantly on WhatsApp</span></a>
 
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
@@ -1506,23 +1790,39 @@ document.getElementById('checkoutBack1')?.addEventListener('click',()=>showCheck
 document.getElementById('checkoutToPayment')?.addEventListener('click',()=>showCheckoutStep(3));
 document.getElementById('checkoutBack2')?.addEventListener('click',()=>showCheckoutStep(2));
 
-document.getElementById('requestPaymentLink')?.addEventListener('click',()=>{
-  const subject=`Reach X — ${checkoutPlan.name} Plan Payment Request`;
-  const body=[
-    `Plan: ${checkoutPlan.name}`,
-    `Billing: ${currentLabel()}`,
-    `Price: ${currentPriceLabel()}`,
-    '',
-    `Name: ${checkoutCustomer.fullName}`,
-    `Business: ${checkoutCustomer.business}`,
-    `Email: ${checkoutCustomer.email}`,
-    `WhatsApp / Phone: ${checkoutCustomer.phone}`,
-    `Country: ${checkoutCustomer.country}`,
-    '',
-    'Please send the payment link for this order.'
-  ].join('\n');
-  window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=reachx.shop@gmail.com&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,'_blank','noopener');
-  showCheckoutStep(4);
+const wiseLinks={
+  Basic:{'1':'https://wise.com/pay/r/paqVfyB4jbcnZqE','3':'https://wise.com/pay/r/dWUCy4gSA8iR8Zw'},
+  Pro:{'1':'https://wise.com/pay/r/1lisoZGObDUgzvk','3':'https://wise.com/pay/r/iLJjKHAc7H0RVZ0'},
+  Advanced:{'1':'https://wise.com/pay/r/27SnVuPnSV-o0VE','3':'https://wise.com/pay/r/4DAb3EFhZgjMbrs'}
+};
+const wiseQr={
+  Basic:{'1':'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXIAAAFyAQAAAADAX2ykAAAChUlEQVR4nO2by23jMBBA36wI5EgBLsCl0B1sTSkpHYilpIAA4jEAhdkDSUkOkDhBHEVazBxkfd5hgMH8aVG+IvHPl3Aw3njjjTfeeOPf46WKgygiwCREEZFLat8uG+pj/L14V37CAJBOAF0GQMJ4ypDa4zb6GP8zfGoeGjQjl+Qgnl+LUYtjb6uP8T/Ex34SYt8p4dkhl9/Wx/h7853qAIDXdver+hj/Db4FXq9AAsFPTvEvojA5BViPQPamv/E3RFV1NmCnhPHNpX0LqqrD3vQ3/mMp/rt4qM5VVb3z1wPMvelv/A0p/hs0owNdNWbQTH3nc0GKmP8ejG/2HXlr0KW+0sGrWnw+JN/icwJIJ5UwTvVTeJISuAWkhfC96W/8DVnqKx2Kw9bSSnWckbFy5r/H5KstkwOYBHxG5Nxycjxn5LKhPsbfi29+ybrSqrkWKEnY6qvD8rNVa5G1rq/mSD2A9b/H5Jv/+rzKv+3SUu/SJJl9D8bPzW2muukIQFfeQTGt2fd/4H1GH/tO25LwQXVIDmLfqVy218f4b/Ol/5XwdFJIDwr+RTT2I6Vqxr84CePU9hB709/4j2WeP78K+BEJ43pfpDBd8XvT3/gbsuqKKPPnbh5XtsVSGXdY/j0gv14eLJ0Svl3mxsn6o0PyNf/Wpy5rFIDkssa/AOmUwWdn8+dD8qv5hurYKfjaFVXXXYK0+e+B+XZ+sjRE4flB9bGnHoeu2XlLfYy/D3+1/51P5ayKrHHNmf8ejXdvnjWec22QYg/gFYEuSzkCvzf9jf8c385qLKee6/4oOQj6KvVxr/ob/44s+31KVNa2ZJjnz+XgjsXnI/Ji/+823njjjTfe+M35f/jg8BSY+jlXAAAAAElFTkSuQmCC','3':'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXIAAAFyAQAAAADAX2ykAAACqUlEQVR4nO2aTWrkMBCFvxoZemlDDpCjyDeYI+VMuYF1lBxgwFoGbN4sJLnzw4QJ4/a0obQwdutbPFCX9KpUJr4z0o9v4eC8884777zzzv+Jtzo66ucAJDOzMbe58UA9zu/MR0nSDDYCxHk14gyaCJIkvedvrcf5nflcI1RTNoN8kY39go3ANbDvV7/zf8mnIUgTALn7OHkC/c6/Gx+X0KIA+lcDQORj9Ti/L9/WtxeQQQAWnweUBrD4XH87SI/zN+GTmZkNYGPZlYPsaQ4C1mKfj9Xj/E58id9rhIq8GmkIKD0u1MA+To/zt+BtzB3X0JVmapJUZlk9fs/J1/hNQwD6BQNM1V8FkQyUhlkWpyP0OL8vTy1e9AuagJoa9ZKm8lggztQSyHRv+p3/elT/HJ8vaqnRjMVp7UQ2RL4IWDodo8f52/HJOmzM1Svbk5Y2MbTC5V3rd/7z2Oobqyn9/GUiPyykYZYlC2q2anu7N/3Ofz02fwUWXy6C/tUUX7qFOIHIgwnW9j+4N/3Ofz3KulmcHxZggeKaR0zJ3ifGh+hxfl+++GdpDqp3gTPUR7sVrCba/fOZ+dXKrUIagihBPEB5qyb6UD3O78jb2EuU8xeglCZzB/SvZk969frVOfm6P0+9JGlp27VauUMzlOqHfH8+IV+P2Thvt/q9WkNO37pyYlt1X9+z8VvAbqtK2KqSQcSy+ri/Oidf86P6FRbBaioncV6NUu54XDz/PTW/9U+W1rrSHzuEcvHwH/Q4vzPf+ifNhs1VQWnsKPvzsXqcvw2vqVz9rrWhPWrLlP6LHuf/jf/UPwkdVrtyVisGOj0Kv184Jd/yo2uRslepVJajt5poz39Pyr8pMwNB7awNb/NfvP58Vv5z/2T70LsJrz8777zzzjvv/H78b0fTjxALW+BQAAAAAElFTkSuQmCC'},
+  Pro:{'1':'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXIAAAFyAQAAAADAX2ykAAACj0lEQVR4nO2bQW7bMBBF35QGvJRu0KNQNwtypN5AOkpvQC0DSPhdcGg5BYwkqO1IxXAhW9RbfGDA0SdnZOIrY/rxJRyCDz744IMPPvhbvPk41X9M/eq3w9yeDU/UE/yd+SxJKqCxW7CXkqSxezMgSZL0nn+0nuDvxJ/8d+4h//IbARicEDMYpOVJeoJ/LG8DSUx2QpJkwzfrCf7u/GrkstYXrsbv1xP8P/AtP3cCZoD5LCAtxtzXTH19BLI3/cF/ip/MzKwHcgEb6mySDazVPj9XT/B34uv6vV6hnVspTT3mC/t5eoK/L19tFFkSuQCQpJEkjd1lV9Q5onFv+oP/YNTd7UgSWQt+KQAkkUvyIEd8j8jX/Gywmph7n5160DQAdMtlO/wMPcE/hM8lyeznQkvNCzW0rz0w9Wv4q2PyF3+1IOazmAYQJBldg3JZmwXbm/7gP8Ob2QmoB84A88kv+XcrPAxP1BP8vXj3z9Uhl6S6P8paqHOQ/BL+6oi8+2eVayftlaRaOlqQqrGO+B6Pb+sX3wZdBXkzWR7kiO/x+Et+XtgC6scdbWFvcxHfo/EX/7zWgi+QZJNdgFp4OCv2v4fm57MfSOayWrVWk50AVrNhM9Z71R/8jbHlZz+V7Nw6e7oG4vz5uHzzz23UubE+S9rexBHfA/Nb/2RbqwtSWa0ecnimfp6e4O/MX/VPArWJY+qhWec38wc71R/8reH130ItMpCLB7meatTRxf73P+H12ifZiySz3ov8Ukmtk3Lv+oP/gM96q98vSK2Jkin6r47Od9K7Xtgkpt7TtQ3bTmmv+oO/Ma4/PtmadIqXFrZyUrx/D8n/3T8przQs0GoOV9WH/ekPPvjggw8++CPyfwBERbXnxmQ1VwAAAABJRU5ErkJggg==','3':'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXIAAAFyAQAAAADAX2ykAAACb0lEQVR4nO2aTYrjMBBGX40NWco3yFHsm4W5mXUU30BaNijULCTZzjTNpMExUU9pEez4LQqK+vtUonzn+F/fwsF444033njjjf+Kl3J6yusAeBGRKdZv04n2GH8wP6qqagCZANVwF8YAOtOpqqo+8q+2x/iD+VgiVH8PIFPsAZeQCdgC+33tN/5ZfnNt7D99bMB+4/fnbxcKLgB0ih9AiefaY/xreKeqM7X0+uEuW35W1XS2PcYfynsRERlApnhRxuWiclsuCtxz+3yuPcYfxOf8vImU6q8J/DWhfugA9yhgvpv9xj/DyxR7SkMVe1SXHkb9kPKVu8VvmzxluHWpPI2aqD+1Js9Otby+m/3GP8WPy0XzmOvlovihq2nZJeS2WP1tlM9RW0N3H786u7TqVyW6LX5b46t/A6gGyJNSOdW/s1vT9bvZb/xTfE7IrngaPwDQqUyUp3PtMf5g3n0IRJE8Cd+WPqvOWe7A+udW+Yf8rImdkjW7lHN2ebL83CCf9Q2BLuEnULj3jGFAcJ3KCso4n2GP8a/ga+imkpVngDEAufTGi9XfNvmqagSAtVcuSbrLwsde7ng3+43/xyl11dUfDevCRq2/m7pl/m2NX+O32wVxWddZt3LWV/Nva/xOv9ocWiJ507QClp9b5rf9SZ0BuS19vhPO6zr+avf7bfNjHYKBsmQHa391vj3GH8Tv++cxdEquv6EU4cxY//xj+Af9meJaou3H/hBeJqogOUeRrHT4q+23N8qztcl59F0vBMutYM7UNv82ytf9nHxK6d2NRvnY/W+r/Kf9SUhs/+nu/1PsMd5444033vj/gf8D5XPl2xeJA0YAAAAASUVORK5CYII='},
+  Advanced:{'1':'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXIAAAFyAQAAAADAX2ykAAACh0lEQVR4nO2bQYrcMBBFX8WGXsowB+ij2DfIkcIcaW5gHWUOELCWAZufhSS7m2TIDLidNpQWamG9xYeiSqpStYmvjPjtSzg477zzzjvvvPMf8VZGi1kHZt1ikFpsSHVvOFCP8zvzvSRpAo2AxnQRsQONNJIk3fOP1uP8TnxbflMH/RsYtLPBYhAmrHxr5oP0OP9YXiNAPzUf5E3Prt/5+9H++Wkxxa7Ja5GO1eP8vny1bxCQwHJUnl7yZ+vf4NaVn02/85/io5mZdUD/Xk1eVku+Ph+rx/md+GzMzUMVr79MpMUg/LLi2Mfpcf4RvA2pBVJ109g1gnQR+SadWmw4UI/ze/HFf2OHKX4XBhdB+GnAYiK9qHjyIXqc35dH6wAa0U8gaV6ndUOSxmfT7/yn+GhmkvKBK7OukQ3pIkhmGsNcEuNn1e/8R6N675yrGhrDDAQJQq1ZSnL/PSdf7FvKzDPVoGW1hWu374l5G8IMpItsoFF+SRoAvXZNOX+P1OP8XnwpZvTj0oowl5s0qYObVwXWFPnZ9Dv/j1EO14kamqdto57Jfv6enNfrdYZ4lfIEjXK5stQ3vD55Uj7HZyM0gmSon5aWflxMsABBWJ4O0eP8vvxtfaPPARlywrterEt3h8fnE/K1QpUrGI2kmgSXTBjIu27fM/I3/rvdtOjvV16fPDm/9U/mEc2sFLFSSw7cR+pxfmd+6598vc5rkrQYhPlv/KP1OL8zn2qHc//e1vdfKJ4cu8P1OP8gPnaNbKiv+jdB+j/pcX5X3n5MNSrHq1TaZeXv+yflbx//Smoklark1gQdPP89Kb92aAClf+Mu/+2nkhp5fnRK3vz/3c4777zzzjt/OP8b+FrC4W+v100AAAAASUVORK5CYII=','3':'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXIAAAFyAQAAAADAX2ykAAACoklEQVR4nO2bQW7bMBBF/y8FeEkBPkCOQt4gZ8qRegPpKDmAAXFpgMTvgqTqGGjaILISFcOFIEpv8YHxUJ8zNIWPjPnHh3DAeOONN954443/E882BjACYExDfQak/i7uqMf4jfkgSVoAzGOhXkZAWpwY4SRJess/Wo/xG/OpZWiLqr+26QSA5LC3HuMfw5McoCkN0MsIMH6xHuM/xw93cyGdgaAyECgU0r56jH8M7yVN9bYQgKufY0YAkvLeeozflJ9JkiPACKfqnyOcABQ2J72nHuM34uv6/KZIWSggA/PTlbp79+30G/8vPGMiMZNshnksRHg9CUhD3TMx7qjH+K345q/mEdVVvXlZqDk6MCwQ99Fj/LY8evHCCWFpF03Vbrl20dI4Td9Nv/F/GS1ucEJQBuBzM8xB7a7+BILF94B8D94CoCUxUJO4BblnsuXvEfk1f3GTsC3cPtdyZS1MW/4emfcSZp7EmE7Sy5PW+sZqnXfVY/w2/GqYy6D5+VILkgyvQ2aYnIDkMuHzoH30GL8tv8bXiXXD26vOQjpnwmdgHi976TH+QXyhJn+tpWdGFAI+A2Ep1JSsP3hQ/sY/awJQ97oTgN9b326nzV8dj1/rz3kA/GUg4HqzyC/gPf/d9Bv//uj1yQiwzQp7S6Gs1Uu3lx7jt+Xb/ncd9WHo9SuEm2e2Ph+Prxnal2GX26qczj2H0zkD/mL7o0Pzv89PAqjtJMZ0UjXRqJ3+HfUYvxF/W3+uNnlxrZdws1ybf/5f+Nrar6dyxkJNPgPzUwbjl+gx/nP8/flJhAnATCeGnycxLAVCGvqe6bvpN/790ePrBSABmukyw3JG+/SmEZifrzR/dUgeN5/ZaqO8bs5v9Gm28xvH5Gn/7zbeeOONN9743flf4hmsyLAjZzAAAAAASUVORK5CYII='}
+};
+
+function currentWiseLink(){
+  return wiseLinks[checkoutPlan.name]?.[checkoutBilling] || '';
+}
+function renderWisePayment(){
+  const link=currentWiseLink();
+  const qr=wiseQr[checkoutPlan.name]?.[checkoutBilling] || '';
+  const qrEl=document.getElementById('wiseQr');
+  const amountEl=document.getElementById('wiseAmount');
+  if(qrEl){qrEl.src=qr;qrEl.dataset.paymentUrl=link;}
+  if(amountEl) amountEl.textContent=currentPriceLabel();
+}
+
+document.getElementById('checkoutToPayment')?.addEventListener('click',()=>{
+  renderWisePayment();
+  showCheckoutStep(3);
+});
+
+document.getElementById('payWithWise')?.addEventListener('click',()=>{
+  const link=currentWiseLink();
+  if(!link) return;
+  const popup=window.open(link,'_blank','noopener,noreferrer');
+  if(!popup) window.location.href=link;
 });
 
 // Reach X service interactions.
@@ -1606,137 +1906,5 @@ if(matchMedia('(pointer:coarse)').matches){
 }
 
 </script>
-
-<div class="modalBackdrop" id="planModal" aria-hidden="true">
-  <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="planModalTitle">
-    <button class="modalClose" id="planModalClose" type="button" aria-label="Close">×</button>
-    <div class="eyebrow">REACH X PLAN</div>
-    <div class="modalTitle" id="planModalTitle">Plan</div>
-    <div class="planModalPrice" id="planModalPrice">$999 / month | 3 months: $799 / month</div>
-    <div class="modalBody" id="planModalBody">Details</div>
-    <div class="modalList" id="planModalList"></div>
-    <div class="actions" style="justify-content:flex-start;margin-top:24px">
-      <button class="btn primary" id="planModalCta" type="button">Choose this plan →</button>
-    </div>
-  </div>
-</div>
-
-
-<div class="checkoutBackdrop" id="checkoutBackdrop" aria-hidden="true">
-  <div class="checkoutCard" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
-    <div class="checkoutHeader">
-      <div>
-        <div class="eyebrow">REACH X CHECKOUT</div>
-        <div class="modalTitle" id="checkoutTitle">Complete your order</div>
-      </div>
-      <button class="modalClose" id="checkoutClose" type="button" aria-label="Close checkout">×</button>
-    </div>
-
-    <div class="checkoutSteps" aria-label="Checkout steps">
-      <div class="checkoutStep active" data-step-pill="1">1 · Details</div>
-      <div class="checkoutStep" data-step-pill="2">2 · Review</div>
-      <div class="checkoutStep" data-step-pill="3">3 · Payment</div>
-    </div>
-
-    <section class="checkoutPage" id="checkoutStep1">
-      <div class="checkoutGrid">
-        <div class="checkoutPanel">
-          <h3>Choose your billing</h3>
-          <div class="checkoutPlans" id="billingOptions"></div>
-
-          <h3 style="margin-top:20px">Customer details</h3>
-          <form class="checkoutForm" id="checkoutForm">
-            <input name="fullName" type="text" placeholder="Full name" autocomplete="name" required>
-            <input name="business" type="text" placeholder="Business / company" autocomplete="organization" required>
-            <input name="email" type="email" placeholder="Email address" autocomplete="email" required>
-            <input name="phone" type="tel" placeholder="WhatsApp / phone" autocomplete="tel" required>
-            <input class="full" name="country" type="text" placeholder="Country" autocomplete="country-name" required>
-          </form>
-        </div>
-
-        <aside class="checkoutPanel">
-          <h3>Order summary</h3>
-          <div class="checkoutSummary">
-            <div class="summaryRow"><span>Plan</span><strong id="summaryPlan">—</strong></div>
-            <div class="summaryRow"><span>Billing</span><strong id="summaryBilling">—</strong></div>
-            <div class="summaryRow"><span>Price</span><strong id="summaryPrice">—</strong></div>
-          </div>
-          <div class="checkoutNote" id="summaryNote"></div>
-          <div class="checkoutActions">
-            <button class="btn primary" id="checkoutToReview" type="button">Review order →</button>
-          </div>
-        </aside>
-      </div>
-    </section>
-
-    <section class="checkoutPage" id="checkoutStep2" hidden>
-      <div class="checkoutGrid">
-        <div class="checkoutPanel">
-          <h3>Review your order</h3>
-          <div class="checkoutSummary" id="reviewCustomer"></div>
-          <div class="checkoutNote" id="reviewDetails"></div>
-          <div class="checkoutActions">
-            <button class="btn" id="checkoutBack1" type="button">← Back</button>
-            <button class="btn primary" id="checkoutToPayment" type="button">Proceed to payment →</button>
-          </div>
-        </div>
-        <aside class="checkoutPanel">
-          <h3>Final amount</h3>
-          <div class="summaryRow"><span>Plan</span><strong id="reviewPlan">—</strong></div>
-          <div class="summaryRow" style="margin-top:10px"><span>Billing</span><strong id="reviewBilling">—</strong></div>
-          <div class="summaryRow" style="margin-top:10px"><span>Total</span><strong id="reviewPrice">—</strong></div>
-        </aside>
-      </div>
-    </section>
-
-    <section class="checkoutPage" id="checkoutStep3" hidden>
-      <div class="checkoutGrid">
-        <div class="checkoutPanel">
-          <h3>Payment</h3>
-          <div class="checkoutNote" style="margin-top:0">Your order is ready for payment. The payment gateway is not connected to this site yet, so no payment will be charged from this screen.</div>
-          <div class="paymentOption disabled"><div><b>Stripe</b><span>Payment gateway connection required</span></div><span>Not connected</span></div>
-          <div class="paymentOption disabled"><div><b>PayPal</b><span>Payment gateway connection required</span></div><span>Not connected</span></div>
-          <div class="checkoutActions">
-            <button class="btn" id="checkoutBack2" type="button">← Back</button>
-            <button class="btn primary" id="requestPaymentLink" type="button">Request payment link →</button>
-          </div>
-        </div>
-        <aside class="checkoutPanel">
-          <h3>Order summary</h3>
-          <div class="checkoutSummary">
-            <div class="summaryRow"><span>Plan</span><strong id="paymentPlan">—</strong></div>
-            <div class="summaryRow"><span>Billing</span><strong id="paymentBilling">—</strong></div>
-            <div class="summaryRow"><span>Total</span><strong id="paymentPrice">—</strong></div>
-          </div>
-          <div class="checkoutNote">After the payment gateway is connected, this step can open Stripe or PayPal checkout directly</div>
-        </aside>
-      </div>
-    </section>
-
-    <section class="checkoutPage" id="checkoutRequestSent" hidden>
-      <div class="checkoutSuccess">
-        <div class="eyebrow">REQUEST SENT</div>
-        <div class="modalTitle" style="font-size:clamp(30px,5vw,56px);margin-bottom:12px">Payment link requested</div>
-        <div class="modalBody">Your selected plan and customer details have been prepared for Reach X. Your email client will open so the request can be sent directly to reachx.shop@gmail.com</div>
-      </div>
-    </section>
-  </div>
-</div>
-
-<div class="modalBackdrop" id="serviceModal" aria-hidden="true">
-  <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <button class="modalClose" id="modalClose" type="button" aria-label="Close">×</button>
-    <div class="eyebrow" id="modalEyebrow">REACH X SERVICE</div>
-    <div class="modalTitle" id="modalTitle">Service</div>
-    <div class="modalBody" id="modalBody">Details</div>
-    <div class="modalList" id="modalList"></div>
-    <div class="actions" style="justify-content:flex-start;margin-top:24px">
-      <a class="btn primary" id="modalCta" href="mailto:reachx.shop@gmail.com?subject=Reach%20X%20Service%20Enquiry">Discuss this service →</a>
-    </div>
-  </div>
-</div>
-
-<a class="whatsapp" href="https://wa.me/18268886971" target="_blank" rel="noopener" aria-label="Connect us instantly on WhatsApp"><span class="waSpark" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" focusable="false" aria-hidden="true"><path d="M20.5 3.5A10.8 10.8 0 0 0 12.02 0C5.99 0 1.08 4.91 1.08 10.94c0 1.93.5 3.82 1.46 5.48L1 24l7.74-1.5a10.88 10.88 0 0 0 3.28.5h.01c6.03 0 10.94-4.91 10.94-10.94 0-2.92-1.14-5.67-3.47-8.56ZM12.03 21.02h-.01a9.05 9.05 0 0 1-2.92-.48l-.21-.07-4.6.89.92-4.48-.07-.23a9.02 9.02 0 1 1 6.89 4.37Zm4.95-6.78c-.27-.14-1.62-.8-1.87-.89-.25-.09-.43-.14-.61.14-.18.27-.7.89-.86 1.08-.16.18-.32.2-.59.07-.27-.14-1.13-.42-2.15-1.34-.8-.71-1.34-1.58-1.5-1.84-.16-.27-.02-.41.12-.55.13-.13.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.52-.45-.45-.61-.46h-.52c-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.27s.98 2.63 1.11 2.81c.14.18 1.92 2.94 4.65 4.12.65.28 1.16.45 1.56.58.66.21 1.26.18 1.74.11.53-.08 1.62-.66 1.85-1.3.23-.64.23-1.19.16-1.3-.07-.12-.25-.18-.52-.32Z"/></svg></span><span class="waText">Connect us instantly on WhatsApp</span></a>
-
 </body>
 </html>
