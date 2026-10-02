@@ -1,0 +1,69 @@
+name: Notify IndexNow
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "*.html"
+      - "sitemap.xml"
+      - "robots.txt"
+      - "0f3a69a83b42648dc8dccc55ca8e1c53.txt"
+      - ".github/workflows/indexnow.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  notify-indexnow:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Wait for IndexNow key to be live
+        env:
+          INDEXNOW_KEY: 0f3a69a83b42648dc8dccc55ca8e1c53
+        shell: bash
+        run: |
+          for i in {1..18}; do
+            if curl -fsS --max-time 10 "https://reachx.shop/${INDEXNOW_KEY}.txt" \
+              | tr -d '\r\n' \
+              | grep -qx "${INDEXNOW_KEY}"; then
+              echo "IndexNow key is live."
+              exit 0
+            fi
+            sleep 10
+          done
+
+          echo "::warning::IndexNow key was not reachable before timeout; submitting anyway."
+
+      - name: Submit sitemap URLs to IndexNow
+        env:
+          INDEXNOW_KEY: 0f3a69a83b42648dc8dccc55ca8e1c53
+        shell: bash
+        run: |
+          mapfile -t URLS < <(sed -n 's:.*<loc>\(.*\)</loc>.*:\1:p' sitemap.xml)
+
+          if [ "${#URLS[@]}" -eq 0 ]; then
+            echo "No URLs found in sitemap.xml"
+            exit 1
+          fi
+
+          URL_JSON="$(printf '%s\n' "${URLS[@]}" | jq -R . | jq -s .)"
+
+          PAYLOAD="$(jq -n \
+            --arg host "reachx.shop" \
+            --arg key "${INDEXNOW_KEY}" \
+            --arg keyLocation "https://reachx.shop/${INDEXNOW_KEY}.txt" \
+            --argjson urlList "${URL_JSON}" \
+            '{host:$host,key:$key,keyLocation:$keyLocation,urlList:$urlList}')"
+
+          curl --fail-with-body --retry 3 --retry-delay 5 \
+            -H "Content-Type: application/json; charset=utf-8" \
+            --data-binary "${PAYLOAD}" \
+            "https://api.indexnow.org/indexnow"
+
+          echo "Submitted ${#URLS[@]} URLs to IndexNow."
