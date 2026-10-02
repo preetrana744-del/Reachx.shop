@@ -1,0 +1,118 @@
+name: SEO Health Check
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "*.html"
+      - "robots.txt"
+      - "sitemap.xml"
+      - ".github/workflows/seo-health-check.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  seo-health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate static SEO files
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import re, sys
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+
+          errors = []
+
+          robots = Path("robots.txt")
+          sitemap = Path("sitemap.xml")
+
+          if not robots.exists():
+              errors.append("robots.txt is missing")
+          else:
+              rt = robots.read_text(encoding="utf-8", errors="ignore")
+              if "Sitemap: https://reachx.shop/sitemap.xml" not in rt:
+                  errors.append("robots.txt does not reference the canonical sitemap")
+
+          sitemap_urls = set()
+          if not sitemap.exists():
+              errors.append("sitemap.xml is missing")
+          else:
+              try:
+                  root = ET.parse(sitemap).getroot()
+                  ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+                  sitemap_urls = {x.text.strip() for x in root.findall("sm:url/sm:loc", ns) if x.text}
+              except Exception as e:
+                  errors.append(f"sitemap.xml is invalid XML: {e}")
+
+          for path in sorted(Path(".").glob("*.html")):
+              html = path.read_text(encoding="utf-8", errors="ignore")
+              low = html.lower()
+
+              def need(pattern, label):
+                  if not re.search(pattern, html, re.I | re.S):
+                      errors.append(f"{path}: missing {label}")
+
+              need(r"<title>\s*[^<]+\s*</title>", "title")
+              need(r'<meta\s+name=["\']description["\'][^>]*content=["\'][^"\']+["\']', "meta description")
+              need(r'<link\s+rel=["\']canonical["\'][^>]*href=["\']https://reachx\.shop/[^"\']*["\']', "canonical")
+              need(r'application/ld\+json', "JSON-LD structured data")
+
+              h1_count = len(re.findall(r"<h1\b", html, re.I))
+              if h1_count != 1:
+                  errors.append(f"{path}: expected exactly one H1, found {h1_count}")
+
+              if "noindex" in low:
+                  errors.append(f"{path}: contains noindex")
+
+              canonical_match = re.search(r'<link\s+rel=["\']canonical["\'][^>]*href=["\']([^"\']+)["\']', html, re.I)
+              if canonical_match:
+                  canonical = canonical_match.group(1)
+                  if canonical not in sitemap_urls:
+                      errors.append(f"{path}: canonical not present in sitemap: {canonical}")
+
+          if errors:
+              print("\n".join(f"ERROR: {e}" for e in errors))
+              sys.exit(1)
+
+          print("Static SEO checks passed.")
+          PY
+
+      - name: Validate live SEO endpoints
+        shell: bash
+        env:
+          INDEXNOW_KEY: 0f3a69a83b42648dc8dccc55ca8e1c53
+        run: |
+          check_url() {
+            url="$1"
+            expected="$2"
+            for i in {1..12}; do
+              body="$(curl -fsSL --max-time 15 "$url" 2>/dev/null || true)"
+              if [ -n "$body" ]; then
+                if [ -z "$expected" ] || printf '%s' "$body" | grep -Fq "$expected"; then
+                  echo "PASS $url"
+                  return 0
+                fi
+              fi
+              sleep 15
+            done
+            echo "::error::Live SEO check failed: $url"
+            return 1
+          }
+
+          check_url "https://reachx.shop/" "Reach X"
+          check_url "https://reachx.shop/robots.txt" "Sitemap: https://reachx.shop/sitemap.xml"
+          check_url "https://reachx.shop/sitemap.xml" "https://reachx.shop/"
+          check_url "https://reachx.shop/${INDEXNOW_KEY}.txt" "${INDEXNOW_KEY}"
+
+      - name: Summary
+        run: echo "Reach X SEO health checks passed."
