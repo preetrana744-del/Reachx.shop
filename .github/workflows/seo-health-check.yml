@@ -98,7 +98,7 @@ jobs:
             for i in {1..12}; do
               body="$(curl -fsSL --max-time 15 "$url" 2>/dev/null || true)"
               if [ -n "$body" ]; then
-                if [ -z "$expected" ] || printf '%s' "$body" | grep -Fq "$expected"; then
+                if [ -z "$expected" ] || [[ "$body" == *"$expected"* ]]; then
                   echo "PASS $url"
                   return 0
                 fi
