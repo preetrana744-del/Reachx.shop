@@ -150,7 +150,10 @@ jobs:
           check() {
             url="$1"; expected="$2"
             body="$(curl -fsSL --retry 3 --retry-delay 5 --max-time 20 "$url")"
-            echo "$body" | grep -Fq "$expected"
+            if [[ "$body" != *"$expected"* ]]; then
+              echo "::error::$url did not contain expected marker: $expected"
+              return 1
+            fi
             echo "PASS $url"
           }
           check "https://reachx.shop/" "ReachX.shop"
