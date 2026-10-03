@@ -1,0 +1,18 @@
+{
+  "name": "ReachX.shop",
+  "short_name": "ReachX",
+  "description": "Web development, SEO and digital marketing agency for modern businesses.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#01010a",
+  "theme_color": "#01010a",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
