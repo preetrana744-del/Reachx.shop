@@ -1,0 +1,75 @@
+name: SEO Sitemap Maintainer
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "*.html"
+      - ".github/workflows/seo-sitemap-maintainer.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: seo-sitemap-maintainer
+  cancel-in-progress: true
+
+jobs:
+  maintain-sitemap:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Rebuild sitemap from live root HTML pages
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from datetime import date
+          from xml.etree.ElementTree import Element, SubElement, ElementTree, indent
+          import subprocess
+
+          BASE = "https://reachx.shop/"
+          pages = sorted(Path(".").glob("*.html"), key=lambda p: (p.name != "index.html", p.name))
+
+          def last_modified(path):
+              try:
+                  out = subprocess.check_output(
+                      ["git", "log", "-1", "--format=%cs", "--", str(path)],
+                      text=True
+                  ).strip()
+                  return out or date.today().isoformat()
+              except Exception:
+                  return date.today().isoformat()
+
+          urlset = Element("urlset", {"xmlns": "http://www.sitemaps.org/schemas/sitemap/0.9"})
+          for page in pages:
+              url = BASE if page.name == "index.html" else BASE + page.name
+              node = SubElement(urlset, "url")
+              SubElement(node, "loc").text = url
+              SubElement(node, "lastmod").text = last_modified(page)
+
+          indent(urlset, space="  ")
+          tree = ElementTree(urlset)
+          tree.write("sitemap.xml", encoding="UTF-8", xml_declaration=True)
+          PY
+
+      - name: Commit sitemap only when it changed
+        shell: bash
+        run: |
+          if git diff --quiet -- sitemap.xml; then
+            echo "Sitemap already matches the current HTML files."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sitemap.xml
+          git commit -m "Auto-maintain sitemap from HTML pages"
+          git push
