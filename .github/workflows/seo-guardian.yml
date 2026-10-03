@@ -1,0 +1,201 @@
+name: SEO Guardian
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "*.html"
+      - "robots.txt"
+      - "sitemap.xml"
+      - "site.webmanifest"
+      - "llms.txt"
+      - "favicon.ico"
+      - "favicon.png"
+      - ".github/workflows/seo-guardian.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: "23 3 * * *"
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: seo-guardian
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate ReachX.shop SEO identity
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, re, sys
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+
+          errors = []
+          def fail(msg): errors.append(msg)
+
+          required = ["robots.txt","sitemap.xml","site.webmanifest","llms.txt","favicon.ico","favicon.png"]
+          for name in required:
+              if not Path(name).exists(): fail(f"missing {name}")
+
+          if Path("robots.txt").exists():
+              text = Path("robots.txt").read_text(encoding="utf-8", errors="ignore")
+              if "Sitemap: https://reachx.shop/sitemap.xml" not in text:
+                  fail("robots.txt missing canonical sitemap")
+
+          if Path("site.webmanifest").exists():
+              try:
+                  manifest = json.loads(Path("site.webmanifest").read_text(encoding="utf-8"))
+                  if manifest.get("name") != "ReachX.shop": fail("manifest name must be ReachX.shop")
+                  if not manifest.get("icons"): fail("manifest has no icons")
+              except Exception as e:
+                  fail(f"invalid site.webmanifest: {e}")
+
+          if Path("llms.txt").exists():
+              text = Path("llms.txt").read_text(encoding="utf-8", errors="ignore")
+              if "ReachX.shop" not in text or "https://reachx.shop/" not in text:
+                  fail("llms.txt missing canonical brand identity")
+
+          sitemap_urls = set()
+          if Path("sitemap.xml").exists():
+              try:
+                  root = ET.parse("sitemap.xml").getroot()
+                  ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+                  sitemap_urls = {n.text.strip() for n in root.findall("s:url/s:loc", ns) if n.text}
+              except Exception as e:
+                  fail(f"invalid sitemap.xml: {e}")
+
+          def objects(value):
+              if isinstance(value, dict):
+                  yield value
+                  for v in value.values(): yield from objects(v)
+              elif isinstance(value, list):
+                  for v in value: yield from objects(v)
+
+          pages = sorted(Path(".").glob("*.html"))
+          for path in pages:
+              html = path.read_text(encoding="utf-8", errors="ignore")
+              title = re.search(r"<title>\s*([^<]+)\s*</title>", html, re.I|re.S)
+              if not title or "ReachX.shop" not in title.group(1):
+                  fail(f"{path}: title must contain ReachX.shop")
+              if len(re.findall(r"<h1\b", html, re.I)) != 1:
+                  fail(f"{path}: expected exactly one H1")
+              if re.search(r"<meta[^>]+name=[\"\']robots[\"\'][^>]+noindex", html, re.I):
+                  fail(f"{path}: contains noindex")
+              cm = re.search(r"<link\s+rel=[\"\']canonical[\"\'][^>]+href=[\"\']([^\"\']+)", html, re.I)
+              if not cm:
+                  fail(f"{path}: missing canonical")
+              elif cm.group(1) not in sitemap_urls:
+                  fail(f"{path}: canonical missing from sitemap")
+              for token, label in [
+                  ("hreflang=\"en\"", "English hreflang"),
+                  ("hreflang=\"x-default\"", "x-default hreflang"),
+                  ("href=\"/site.webmanifest\"", "manifest link")
+              ]:
+                  if token not in html: fail(f"{path}: missing {label}")
+
+              blocks = re.findall(r"<script[^>]*type=[\"\']application/ld\+json[\"\'][^>]*>([\s\S]*?)</script>", html, re.I)
+              if not blocks:
+                  fail(f"{path}: missing JSON-LD")
+                  continue
+              entities = []
+              for raw in blocks:
+                  try: data = json.loads(raw)
+                  except Exception as e:
+                      fail(f"{path}: invalid JSON-LD: {e}")
+                      continue
+                  entities.extend(list(objects(data)))
+
+              def typed(obj, kind):
+                  t = obj.get("@type")
+                  return t == kind or (isinstance(t, list) and kind in t)
+
+              for kind in ("Organization","WebSite"):
+                  nodes = [o for o in entities if typed(o, kind)]
+                  if not nodes:
+                      fail(f"{path}: missing {kind} entity")
+                      continue
+                  if not any(o.get("name") == "ReachX.shop" for o in nodes):
+                      fail(f"{path}: {kind} name mismatch")
+                  aliases = set()
+                  for o in nodes:
+                      a = o.get("alternateName", [])
+                      if isinstance(a, str): aliases.add(a)
+                      elif isinstance(a, list): aliases.update(map(str,a))
+                  if not {"ReachX","Reach X"}.issubset(aliases):
+                      fail(f"{path}: {kind} aliases incomplete")
+
+          expected = {"https://reachx.shop/" if p.name=="index.html" else "https://reachx.shop/"+p.name for p in pages}
+          if sitemap_urls != expected:
+              fail(f"sitemap mismatch: expected {len(expected)} HTML URLs, got {len(sitemap_urls)}")
+
+          if errors:
+              print("\n".join("ERROR: "+e for e in errors))
+              sys.exit(1)
+          print(f"PASS: {len(pages)} pages have consistent ReachX.shop SEO signals.")
+          PY
+
+      - name: Validate live endpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          check() {
+            url="$1"; expected="$2"
+            body="$(curl -fsSL --retry 3 --retry-delay 5 --max-time 20 "$url")"
+            echo "$body" | grep -Fq "$expected"
+            echo "PASS $url"
+          }
+          check "https://reachx.shop/" "ReachX.shop"
+          check "https://reachx.shop/robots.txt" "Sitemap: https://reachx.shop/sitemap.xml"
+          check "https://reachx.shop/sitemap.xml" "https://reachx.shop/"
+          check "https://reachx.shop/site.webmanifest" "ReachX.shop"
+          check "https://reachx.shop/llms.txt" "ReachX.shop"
+
+  report:
+    needs: audit
+    if: always() && needs.audit.result == 'failure'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open or update SEO Guardian issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = "[SEO Guardian] ReachX.shop SEO check failed";
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: "open", per_page: 100
+            });
+            const existing = issues.find(i => i.title === title);
+            const body = `Automated SEO Guardian detected a regression. Review: ${runUrl}`;
+            if (existing) {
+              await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.number, body});
+            } else {
+              await github.rest.issues.create({owner: context.repo.owner, repo: context.repo.repo, title, body});
+            }
+
+  recover:
+    needs: audit
+    if: always() && needs.audit.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close recovered SEO Guardian issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = "[SEO Guardian] ReachX.shop SEO check failed";
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: "open", per_page: 100
+            });
+            const existing = issues.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.number, body: "SEO Guardian is passing again. Closing automatically."});
+              await github.rest.issues.update({owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.number, state: "closed"});
+            }
