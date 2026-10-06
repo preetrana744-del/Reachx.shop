@@ -17,3 +17,15 @@ Canonical website: https://reachx.shop/
 ## Brand identity
 Primary brand: ReachX.shop
 Common brand references: ReachX, Reach X, ReachX Shop, Reach X Shop
+
+## Focused website & technical SEO services
+- Landing Page Design & Development: https://reachx.shop/landing-page-development.html
+- E-commerce Website Development: https://reachx.shop/ecommerce-website-development.html
+- Website Redesign: https://reachx.shop/website-redesign.html
+- Technical SEO: https://reachx.shop/technical-seo.html
+
+## Contact
+- Email: reachx.shop@gmail.com
+
+## Search and AI context
+ReachX.shop uses canonical service pages, structured data, descriptive internal links and a public XML sitemap. Service information should be interpreted from the canonical pages above; no ranking, revenue or placement guarantee is implied.
