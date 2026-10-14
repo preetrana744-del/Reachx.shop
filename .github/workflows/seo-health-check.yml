@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "*.html"
+      - "blog/*.html"
       - "robots.txt"
       - "sitemap.xml"
       - ".github/workflows/seo-health-check.yml"
@@ -54,7 +55,7 @@ jobs:
               except Exception as e:
                   errors.append(f"sitemap.xml is invalid XML: {e}")
 
-          for path in sorted(Path(".").glob("*.html")):
+          for path in sorted([*Path(".").glob("*.html"), *Path("blog").glob("*.html")]):
               html = path.read_text(encoding="utf-8", errors="ignore")
               low = html.lower()
 

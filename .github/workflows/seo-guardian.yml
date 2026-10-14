@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "*.html"
+      - "blog/*.html"
       - "robots.txt"
       - "sitemap.xml"
       - "site.webmanifest"
@@ -80,7 +81,7 @@ jobs:
               elif isinstance(value, list):
                   for v in value: yield from objects(v)
 
-          pages = sorted(Path(".").glob("*.html"))
+          pages = sorted([*Path(".").glob("*.html"), *Path("blog").glob("*.html")])
           for path in pages:
               html = path.read_text(encoding="utf-8", errors="ignore")
               title = re.search(r"<title>\s*([^<]+)\s*</title>", html, re.I|re.S)
@@ -133,7 +134,7 @@ jobs:
                   if not {"ReachX","Reach X"}.issubset(aliases):
                       fail(f"{path}: {kind} aliases incomplete")
 
-          expected = {"https://reachx.shop/" if p.name=="index.html" else "https://reachx.shop/"+p.name for p in pages}
+          expected = {"https://reachx.shop/" + (p.as_posix().removesuffix("index.html") if p.name == "index.html" else p.as_posix()) for p in pages}
           if sitemap_urls != expected:
               fail(f"sitemap mismatch: expected {len(expected)} HTML URLs, got {len(sitemap_urls)}")
 

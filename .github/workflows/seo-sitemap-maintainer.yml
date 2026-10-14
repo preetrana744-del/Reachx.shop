@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "*.html"
+      - "blog/*.html"
       - ".github/workflows/seo-sitemap-maintainer.yml"
   workflow_dispatch:
 
@@ -26,7 +27,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Rebuild sitemap from live root HTML pages
+      - name: Rebuild sitemap from live HTML pages
         shell: bash
         run: |
           python3 - <<'PY'
@@ -36,7 +37,7 @@ jobs:
           import subprocess
 
           BASE = "https://reachx.shop/"
-          pages = sorted(Path(".").glob("*.html"), key=lambda p: (p.name != "index.html", p.name))
+          pages = sorted([*Path(".").glob("*.html"), *Path("blog").glob("*.html")], key=lambda p: (p.as_posix() != "index.html", p.as_posix()))
 
           def last_modified(path):
               try:
@@ -50,7 +51,7 @@ jobs:
 
           urlset = Element("urlset", {"xmlns": "http://www.sitemaps.org/schemas/sitemap/0.9"})
           for page in pages:
-              url = BASE if page.name == "index.html" else BASE + page.name
+              url = BASE + (page.as_posix().removesuffix("index.html") if page.name == "index.html" else page.as_posix())
               node = SubElement(urlset, "url")
               SubElement(node, "loc").text = url
               SubElement(node, "lastmod").text = last_modified(page)

@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "*.html"
+      - "blog/*.html"
       - "sitemap.xml"
       - "robots.txt"
       - "0f3a69a83b42648dc8dccc55ca8e1c53.txt"
