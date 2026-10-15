@@ -88,6 +88,9 @@ jobs:
           print("Static SEO checks passed.")
           PY
 
+      - name: Check unique metadata and internal links
+        run: python3 scripts/check-seo.py
+
       - name: Validate live SEO endpoints
         shell: bash
         env:
