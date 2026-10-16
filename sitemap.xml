@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://reachx.shop/</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-16</lastmod>
   </url>
   <url>
     <loc>https://reachx.shop/ai-marketing.html</loc>
@@ -10,7 +10,7 @@
   </url>
   <url>
     <loc>https://reachx.shop/ai-seo.html</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-10-16</lastmod>
   </url>
   <url>
     <loc>https://reachx.shop/blog/ecommerce-product-page-seo-checklist.html</loc>
@@ -18,7 +18,7 @@
   </url>
   <url>
     <loc>https://reachx.shop/blog/</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-16</lastmod>
   </url>
   <url>
     <loc>https://reachx.shop/blog/landing-page-vs-website.html</loc>
@@ -66,7 +66,7 @@
   </url>
   <url>
     <loc>https://reachx.shop/seo.html</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-10-16</lastmod>
   </url>
   <url>
     <loc>https://reachx.shop/social-media-marketing.html</loc>
@@ -88,4 +88,5 @@
     <loc>https://reachx.shop/website-seo-audit.html</loc>
     <lastmod>2026-10-14</lastmod>
   </url>
+  <url><loc>https://reachx.shop/blog/generative-search-optimization-guide.html</loc><lastmod>2026-10-16</lastmod></url>
 </urlset>
