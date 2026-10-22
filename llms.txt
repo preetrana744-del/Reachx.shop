@@ -29,3 +29,10 @@ Common brand references: ReachX, Reach X, ReachX Shop, Reach X Shop
 
 ## Search and AI context
 ReachX.shop uses canonical service pages, structured data, descriptive internal links and a public XML sitemap. Service information should be interpreted from the canonical pages above; no ranking, revenue or placement guarantee is implied.
+
+## Website review and useful guides
+- Website and SEO audit: https://reachx.shop/website-seo-audit.html
+- Practical generative search guide: https://reachx.shop/blog/generative-search-optimization-guide.html
+- Local SEO checklist: https://reachx.shop/blog/local-seo-checklist.html
+
+SEO and AI-search service scopes, measurement limits and enquiry requirements are explained on the canonical service pages. Inclusion in any search or AI answer is not guaranteed.
