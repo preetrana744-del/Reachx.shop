@@ -112,7 +112,7 @@ assert.equal(found[0].plan_name, 'Pro');
 assert.equal(dispatch('change', el({ '#billingOptions': {} }, { name: 'billing', value: 'PRIVATE_CUSTOMER_VALUE' })).length, 0);
 assert.equal(dispatch('change', el({ '#billingOptions': {} }, { name: 'billing', value: 'constructor' })).length, 0);
 assert.equal(dispatch('change', el({}, { name: 'email', value: 'PRIVATE_CUSTOMER_VALUE' })).length, 0);
-assert.equal(dispatch('submit', el({}, { id: 'queryForm', email: 'PRIVATE_CUSTOMER_VALUE' }))[0].name, 'enquiry_email_open');
+assert.equal(dispatch('submit', el({}, { id: 'queryForm', email: 'PRIVATE_CUSTOMER_VALUE' }))[0].name, 'enquiry_submit_attempt');
 assert.equal(dispatch('submit', el({}, { id: 'topAuthForm', email: 'PRIVATE_CUSTOMER_VALUE' })).length, 0);
 
 assert.equal(click({ '.chapterNav button[data-target]': { dataset: { target: '3' } } })[0].section_name, 'project_enquiry');

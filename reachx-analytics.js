@@ -122,8 +122,8 @@
   }, true);
   document.addEventListener('submit', (event) => {
     if (event.target?.id === 'queryForm') {
-      // The contact form opens a mail client; the email is not necessarily sent.
-      send('enquiry_email_open');
+      // An attempt is separate from the backend-confirmed generate_lead event.
+      send('enquiry_submit_attempt');
     }
   }, true);
   if (typeof window.IntersectionObserver === 'function') {
