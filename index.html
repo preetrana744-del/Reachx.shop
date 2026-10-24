@@ -1508,7 +1508,7 @@ input::placeholder,textarea::placeholder{color:#746E63;opacity:1}
 :focus-visible{outline-color:#866019!important}
 .contact strong[style]{color:#795719!important}.modalBody,.priceQualifier{color:#625D54}.modalTitle,.modalItem{color:#25231F}.contactInfo a{text-decoration-color:rgba(121,87,25,.4)}
 .planHeading{color:#795719;opacity:1}.priceQualifier{white-space:normal;overflow-wrap:anywhere}
-</style><link rel="stylesheet" href="/reachx-collaborate.css?v=20261025"><script defer src="/reachx-collaborate.js?v=20261025-mobile2"></script></head>
+</style><link rel="stylesheet" href="/reachx-collaborate.css?v=20261025"><script defer src="/reachx-collaborate.js?v=20261025-perf3"></script></head>
 <body>
 <canvas id="webgl" aria-hidden="true"></canvas>
 <!-- Replace /assets/reachx-background.gif with the user's supplied GIF/video. -->
@@ -2432,10 +2432,10 @@ function showAnimationFallback(){
   const label=document.getElementById('kineticLogoLabel');
   if(label) label.style.display='none';
 }
-if (matchMedia('(prefers-reduced-motion: reduce)').matches || matchMedia('(pointer:coarse)').matches || matchMedia('(max-width:900px)').matches || navigator.connection?.saveData) {
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
   showAnimationFallback();
 } else {
-  const startVisuals=()=>import('/reachx-animation.js?v=ivory-black-particles-v6').then(module=>module.startAnimation(showAnimationFallback)).catch(showAnimationFallback);
+  const startVisuals=()=>import('/reachx-animation.js?v=mobile-particles-v7').then(module=>module.startAnimation(showAnimationFallback)).catch(showAnimationFallback);
   if ('requestIdleCallback' in window) requestIdleCallback(startVisuals,{timeout:2500});
   else setTimeout(startVisuals,1000);
 }

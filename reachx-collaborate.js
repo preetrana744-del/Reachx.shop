@@ -4,10 +4,10 @@
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,coarse=matchMedia('(pointer:coarse)').matches;
  const N=24,M=30,chains=Array.from({length:N},(_,i)=>({phase:i*2.399,points:Array.from({length:M},()=>({x:0,y:0,vx:0,vy:0})),path:[]}));
  let w=700,h=440,dpr=1,ready=false,px=110,py=112,vx=0,vy=0,tx=110,ty=112,active=false,dragging=false,living=!reduce,clock=0,last=0,raf=0,inView=true,demoAt=-1,press=0,pulse=0,meshMotion=0,stableAngle=.8,pointerClientX=0,pointerClientY=0,touchActive=false,pointerIsTouch=false;
- function size(){w=window.innerWidth;h=window.innerHeight;canvas.style.width=w+'px';canvas.style.height=h+'px';dpr=Math.min(devicePixelRatio||1,coarse?1.25:2);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);ready=false;wake()}
+ function size(){w=window.innerWidth;h=window.innerHeight;canvas.style.width=w+'px';canvas.style.height=h+'px';dpr=Math.min(devicePixelRatio||1,coarse?1:1.5);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);ready=false;wake()}
  function smooth(points){if(!points.length)return;ctx.moveTo(points[0].x,points[0].y);for(let j=1;j<points.length-1;j++)ctx.quadraticCurveTo(points[j].x,points[j].y,(points[j].x+points[j+1].x)/2,(points[j].y+points[j+1].y)/2);ctx.lineTo(points[points.length-1].x,points[points.length-1].y)}
- function paint(){meshMotion=0;
-  const box=stage.getBoundingClientRect();canvas.style.left=(-box.left)+'px';canvas.style.top=(-box.top)+'px';ctx.clearRect(0,0,w,h);const cx=box.left+stage.clientWidth/2,cy=box.top+stage.clientHeight/2,half=button.offsetWidth/2,rad=32,dist=Math.hypot(px,py),angle=dist>3?(stableAngle=Math.atan2(py,px)):stableAngle,nx=-Math.sin(angle),ny=Math.cos(angle),energy=Math.min(Math.hypot(vx,vy)/12,1);
+ function paint(box){meshMotion=0;
+  canvas.style.left=(-box.left)+'px';canvas.style.top=(-box.top)+'px';ctx.clearRect(0,0,w,h);const cx=box.left+stage.clientWidth/2,cy=box.top+stage.clientHeight/2,half=button.offsetWidth/2,rad=32,dist=Math.hypot(px,py),angle=dist>3?(stableAngle=Math.atan2(py,px)):stableAngle,nx=-Math.sin(angle),ny=Math.cos(angle),energy=Math.min(Math.hypot(vx,vy)/12,1);
   ctx.save();
   for(let i=0;i<N;i++){
    const c=chains[i],u=(i-(N-1)/2)/((N-1)/2),a=angle+u*1.18+Math.sin(i*2.3)*.085;
@@ -48,9 +48,9 @@
     if(growth===1){if(side>0)left.push({x:lx,y:ly});else right.push({x:rx,y:ry})}
     shine.push({x:p[j].x+nnx*(width*.45+(side>0?extension*.62:0))-tangentX*sweep*.62,y:p[j].y+nny*(width*.45+(side>0?extension*.62:0))-tangentY*sweep*.62});
    }
-   if(c.path.length)for(let j=0;j<M;j++)meshMotion=Math.max(meshMotion,Math.hypot(p[j].x-c.path[j].x,p[j].y-c.path[j].y));c.path=p.map(q=>({x:q.x,y:q.y}));
+   if(c.path.length)for(let j=0;j<M;j++)meshMotion=Math.max(meshMotion,Math.hypot(p[j].x-c.path[j].x,p[j].y-c.path[j].y));if(!c.path.length)c.path=p.map(q=>({x:q.x,y:q.y}));else for(let j=0;j<M;j++){c.path[j].x=p[j].x;c.path[j].y=p[j].y;}
    ctx.beginPath();smooth(left);const rev=right.reverse();ctx.lineTo(rev[0].x,rev[0].y);for(let j=1;j<rev.length-1;j++)ctx.quadraticCurveTo(rev[j].x,rev[j].y,(rev[j].x+rev[j+1].x)/2,(rev[j].y+rev[j+1].y)/2);ctx.lineTo(rev[rev.length-1].x,rev[rev.length-1].y);ctx.closePath();
-   const grad=ctx.createLinearGradient(ax-12,ay-15,ex+8,ey+15);grad.addColorStop(0,'#080b12');grad.addColorStop(.28,'#30343b');grad.addColorStop(.48,'#101720');grad.addColorStop(.7,'#454b52');grad.addColorStop(1,'#080d15');ctx.fillStyle=grad;ctx.shadowColor='#0a10251c';ctx.shadowBlur=3;ctx.shadowOffsetY=4;ctx.fill();ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+   const grad=ctx.createLinearGradient(ax-12,ay-15,ex+8,ey+15);grad.addColorStop(0,'#080b12');grad.addColorStop(.28,'#30343b');grad.addColorStop(.48,'#101720');grad.addColorStop(.7,'#454b52');grad.addColorStop(1,'#080d15');ctx.fillStyle=grad;ctx.shadowColor='#0a10251c';ctx.shadowBlur=coarse?0:3;ctx.shadowOffsetY=4;ctx.fill();ctx.shadowBlur=0;ctx.shadowOffsetY=0;
    ctx.beginPath();smooth(shine);ctx.strokeStyle=i%3===0?'#d3d9de80':'#abb5bc38';ctx.lineWidth=i%3===0?.65:.35;ctx.stroke();
   }
   // Inter-strand membranes join and separate as adjacent tendrils pass.
@@ -114,11 +114,12 @@
   button.style.transform=`perspective(650px) translate(${tiltX*.025}px,${tiltY*.025}px) rotateX(${-tiltY*.018}deg) rotateY(${tiltX*.018}deg) scale(${1-press*.055})`;
   button.style.background=`radial-gradient(ellipse at ${38+tiltX*.12}% ${12+tiltY*.07}%,#4c586a 0%,#202936 23%,#080c14 63%,#151e2a 100%)`;
  }
- function tick(t){raf=0;if(document.hidden||!inView){last=0;return}if(coarse&&last&&t-last<30){wake();return}const dt=Math.min((t-last)/16.67||1,2);last=t;if(living)clock+=dt/60;
+ function tick(t){raf=0;if(document.hidden||!inView){last=0;return}if(coarse&&last&&t-last<39){wake();return}const dt=Math.min((t-last)/16.67||1,2);last=t;if(living)clock+=dt/60;
 
   let xx=tx,yy=ty;if(!active&&living){xx=Math.min(w*.26,150)*Math.sin(clock*.44+.7);yy=42+Math.sin(clock*.72)*18}
-  if(active){const box=stage.getBoundingClientRect();xx=pointerClientX-box.left-stage.clientWidth/2;yy=pointerClientY-box.top-stage.clientHeight/2;}
-  const follow=1-Math.exp(-dt*.24);const oldX=px,oldY=py;px+=(xx-px)*follow;py+=(yy-py)*follow;vx=(px-oldX)*.35;vy=(py-oldY)*.35;px+=vx*.12;py+=vy*.12;press*=Math.pow(.89,dt);paint();
+  const box=stage.getBoundingClientRect();
+  if(active){xx=pointerClientX-box.left-stage.clientWidth/2;yy=pointerClientY-box.top-stage.clientHeight/2;}
+  const follow=1-Math.exp(-dt*.24);const oldX=px,oldY=py;px+=(xx-px)*follow;py+=(yy-py)*follow;vx=(px-oldX)*.35;vy=(py-oldY)*.35;px+=vx*.12;py+=vy*.12;press*=Math.pow(.89,dt);paint(box);
   const unsettled=meshMotion>.03;if(living||demoAt>=0||Math.hypot(xx-px,yy-py)+Math.hypot(vx,vy)>.08||unsettled||press>.001)wake();else last=0;
  }
  function wake(){if(!raf&&!document.hidden&&inView)raf=requestAnimationFrame(tick)}

@@ -81,7 +81,7 @@ if(window.visualViewport && !coarseDevice){
 }
 
 const root=new THREE.Group(); scene.add(root);
-const count=Math.max(5000,Math.floor(18000*FX_QUALITY));
+const count=Math.max(coarseDevice?2800:5000,Math.floor(18000*FX_QUALITY*(coarseDevice?.65:1)));
 const positions=new Float32Array(count*3);
 const seeds=new Float32Array(count);
 const colors=new Float32Array(count*3);
@@ -427,11 +427,13 @@ let frameCounter = 0;
 let perfLast = performance.now();
 let dynamicLowMode = lowDevice || veryLowDevice;
 
-addEventListener('pointermove',e=>{
-  if(e.pointerType==='touch') return;
+const followBackgroundPointer=e=>{
+  
   targetMX=(e.clientX/window.innerWidth-.5)*1.1;
   targetMY=(e.clientY/window.innerHeight-.5)*.75;
-},{passive:true});
+};
+addEventListener('pointermove',followBackgroundPointer,{passive:true});
+addEventListener('touchmove',e=>{if(e.touches&&e.touches.length===1)followBackgroundPointer(e.touches[0])},{passive:true});
 let scrollFramePending=false;
 addEventListener('scroll',()=>{
   if(scrollFramePending) return;
@@ -452,7 +454,8 @@ let pageHidden=document.hidden;
 document.addEventListener('visibilitychange',()=>{
   pageHidden=document.hidden;
 });
-let animationFrame = 0;
+let animationFrame = 0,lastRenderedAt=0;
+const minimumFrameMs=coarseDevice?1000/30:1000/60;
 let animationStopped = false;
 function stopAnimation(error){
   if(animationStopped) return;
@@ -471,6 +474,8 @@ function animate(t){
     try { animate(nextTime); } catch(error) { stopAnimation(error); }
   });
   if(pageHidden) return;
+  if(lastRenderedAt&&t-lastRenderedAt<minimumFrameMs-1)return;
+  lastRenderedAt=t;
 
   frameCounter++;
   // Adapt to real device performance. We do not change layout or the visual system;
