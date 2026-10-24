@@ -51,7 +51,7 @@ function viewportSize(){
 }
 
 const scene=new THREE.Scene();
-scene.fog=new THREE.FogExp2(0x020307,0.018);
+scene.fog=new THREE.FogExp2(0xf7f5f0,0.018);
 const camera=new THREE.PerspectiveCamera(55,1,.1,180);
 camera.position.set(0,0,18);
 
@@ -87,9 +87,9 @@ const seeds=new Float32Array(count);
 const colors=new Float32Array(count*3);
 const base=new Float32Array(count*3);
 const palette=[
-  new THREE.Color(0xffd36a),new THREE.Color(0xffc94f),
-  new THREE.Color(0xffe6a2),new THREE.Color(0xf3b63f),
-  new THREE.Color(0xd89b2b),new THREE.Color(0xfff0c2)
+  new THREE.Color(0x000000),new THREE.Color(0x000000),
+  new THREE.Color(0x000000),new THREE.Color(0x000000),
+  new THREE.Color(0x000000),new THREE.Color(0x000000)
 ];
 for(let i=0;i<count;i++){
   const rr=Math.pow(Math.random(),.42)*8.8;
@@ -110,23 +110,16 @@ geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
 geo.setAttribute('aSeed',new THREE.BufferAttribute(seeds,1));
 geo.setAttribute('color',new THREE.BufferAttribute(colors,3));
 const mat=new THREE.PointsMaterial({
-  size:.038,vertexColors:true,transparent:true,opacity:.86,blending:THREE.AdditiveBlending,depthWrite:false
+  size:.064,vertexColors:true,transparent:true,opacity:.98,blending:THREE.NormalBlending,depthWrite:false
 });
 const particleField=new THREE.Points(geo,mat);
 if(FX_QUALITY<.7){
-  mat.opacity=.78;
+  mat.opacity=.94;
 }
 root.add(particleField);
 
-// Elegant holographic shells, visible as the camera moves through the field.
+// Keep the particle animation without orbital diagram lines.
 const shellGroup=new THREE.Group(); root.add(shellGroup);
-for(let i=0;i<(FX_QUALITY<.7?5:6);i++){
-  const shell=new THREE.Mesh(
-    new THREE.TorusGeometry(3.6+i*.7,.006,6,96),
-    new THREE.MeshBasicMaterial({color:0x8066ff,transparent:true,opacity:.08+i*.01})
-  );
-  shell.rotation.set(.1+i*.15,.3+i*.2,i*.35); shellGroup.add(shell);
-}
 
 // Dedicated kinetic hero logos.
 // The silhouettes are sampled directly from the actual Unicode glyphs ⚡ and ∞.
@@ -143,9 +136,9 @@ scene.add(
 );
 
 const pipelineColors=[
-  0xffe6a2,
-  0xffc94f,
-  0xfff0c2
+  0x000000,
+  0x000000,
+  0x000000
 ];
 
 function createSpacePipeline(
@@ -205,10 +198,10 @@ function createSpacePipeline(
   const m=
     new THREE.PointsMaterial({
       color,
-      size:.039,
+      size:.060,
       transparent:true,
-      opacity:.55,
-      blending:THREE.AdditiveBlending,
+      opacity:.82,
+      blending:THREE.NormalBlending,
       depthWrite:false
     });
 
@@ -328,9 +321,9 @@ function makeCornerField(cx,cy,cz,seed){
   const g=new THREE.BufferGeometry();
   g.setAttribute('position',new THREE.BufferAttribute(arr,3));
   const m=new THREE.PointsMaterial({
-    color:[0xffd36a,0xffc44a,0xffe8aa,0xf0ae36][seed%4],
-    size:.029,transparent:true,opacity:.34,
-    blending:THREE.AdditiveBlending,depthWrite:false
+    color:[0x000000,0x000000,0x000000,0x000000][seed%4],
+    size:.048,transparent:true,opacity:.64,
+    blending:THREE.NormalBlending,depthWrite:false
   });
   const p=new THREE.Points(g,m);
   p.userData={seed};
@@ -391,7 +384,7 @@ function makeParticleShape(points, size, color, opacity){
   g.setAttribute('position',new THREE.BufferAttribute(a,3));
   const m=new THREE.PointsMaterial({
     color,size,transparent:true,opacity,
-    blending:THREE.AdditiveBlending,depthWrite:false
+    blending:THREE.NormalBlending,depthWrite:false
   });
   return new THREE.Points(g,m);
 }
@@ -402,8 +395,8 @@ const INFINITY_FONT = `"Arial Black","Arial","Helvetica","DejaVu Sans",sans-seri
 const flashCloud = glyphPoints('⚡', FLASH_FONT, 900, 292, Math.floor(3600*FX_QUALITY), 2.55);
 const infinityCloud = glyphPoints('∞', INFINITY_FONT, 900, 300, Math.floor(3800*FX_QUALITY), 2.95);
 
-const bolt=makeParticleShape(flashCloud,.034,0xffd45f,.92);
-const infinity=makeParticleShape(infinityCloud,.032,0xffd45f,.92);
+const bolt=makeParticleShape(flashCloud,.034,0x000000,.92);
+const infinity=makeParticleShape(infinityCloud,.032,0x000000,.92);
 
 bolt.position.set(0,0,-1.2);
 infinity.position.set(0,0,-1.4);
@@ -411,11 +404,11 @@ infinity.visible=false;
 
 const boltGlow=makeParticleShape(
   glyphPoints('⚡', FLASH_FONT, 900, 292, 900, 2.58),
-  .078,0xffb52d,.26
+  .078,0x000000,.26
 );
 const infinityGlow=makeParticleShape(
   glyphPoints('∞', INFINITY_FONT, 900, 300, 950, 2.98),
-  .072,0xffb52d,.24
+  .072,0x000000,.24
 );
 
 boltGlow.position.copy(bolt.position);
@@ -557,7 +550,7 @@ if(updateField){
     }
 
     p.geometry.attributes.position.needsUpdate=true;
-    p.material.opacity=.40+.18*(.5+.5*Math.sin(t*.001+seed))
+    p.material.opacity=.70+.20*(.5+.5*Math.sin(t*.001+seed))
       +Math.min(.10,Math.abs(velocity)*1.6);
   }
 }
@@ -650,7 +643,7 @@ for(const p of cornerFields){
   p.rotation.x = Math.sin(t*.00035+s)*.09 + mouseY*.035;
   p.rotation.y = Math.cos(t*.00031+s)*.09 + mouseX*.035;
   p.position.z = Math.sin(t*.00025+s)*.45 + Math.sin(scrollP*6+s)*.7;
-  p.material.opacity = .22 + .15*(.5+.5*Math.sin(t*.001+s))
+  p.material.opacity = .55 + .20*(.5+.5*Math.sin(t*.001+s))
                      + Math.min(.12,Math.abs(velocity)*1.8);
 }
 cornerGroup.rotation.y += (mouseX*.08-cornerGroup.rotation.y)*.018;
