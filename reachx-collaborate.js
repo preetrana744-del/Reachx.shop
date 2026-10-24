@@ -5,7 +5,7 @@
  const N=24,M=30,chains=Array.from({length:N},(_,i)=>({phase:i*2.399,points:Array.from({length:M},()=>({x:0,y:0,vx:0,vy:0})),path:[]}));
  let w=700,h=440,dpr=1,ready=false,px=110,py=112,vx=0,vy=0,tx=110,ty=112,active=false,dragging=false,living=!reduce,clock=0,last=0,raf=0,inView=true,demoAt=-1,press=0,pulse=0,meshMotion=0,stableAngle=.8,pointerClientX=0,pointerClientY=0,touchActive=false,pointerIsTouch=false;
  function size(){w=window.innerWidth;h=window.innerHeight;canvas.style.width=w+'px';canvas.style.height=h+'px';dpr=Math.min(devicePixelRatio||1,coarse?1.25:2);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);ready=false;wake()}
- function smooth(points){if(!points.length)return;ctx.moveTo(points[0].x,points[0].y);for(let j=1;j<points.length-1;j++)ctx.quadraticCurveTo(points[j].x,points[j].y,(points[j].x+points[j+1].x)/2,(points[j].y+points[j+1].y)/2);ctx.lineTo(points.at(-1).x,points.at(-1).y)}
+ function smooth(points){if(!points.length)return;ctx.moveTo(points[0].x,points[0].y);for(let j=1;j<points.length-1;j++)ctx.quadraticCurveTo(points[j].x,points[j].y,(points[j].x+points[j+1].x)/2,(points[j].y+points[j+1].y)/2);ctx.lineTo(points[points.length-1].x,points[points.length-1].y)}
  function paint(){meshMotion=0;
   const box=stage.getBoundingClientRect();canvas.style.left=(-box.left)+'px';canvas.style.top=(-box.top)+'px';ctx.clearRect(0,0,w,h);const cx=box.left+stage.clientWidth/2,cy=box.top+stage.clientHeight/2,half=button.offsetWidth/2,rad=32,dist=Math.hypot(px,py),angle=dist>3?(stableAngle=Math.atan2(py,px)):stableAngle,nx=-Math.sin(angle),ny=Math.cos(angle),energy=Math.min(Math.hypot(vx,vy)/12,1);
   ctx.save();
@@ -49,7 +49,7 @@
     shine.push({x:p[j].x+nnx*(width*.45+(side>0?extension*.62:0))-tangentX*sweep*.62,y:p[j].y+nny*(width*.45+(side>0?extension*.62:0))-tangentY*sweep*.62});
    }
    if(c.path.length)for(let j=0;j<M;j++)meshMotion=Math.max(meshMotion,Math.hypot(p[j].x-c.path[j].x,p[j].y-c.path[j].y));c.path=p.map(q=>({x:q.x,y:q.y}));
-   ctx.beginPath();smooth(left);const rev=right.reverse();ctx.lineTo(rev[0].x,rev[0].y);for(let j=1;j<rev.length-1;j++)ctx.quadraticCurveTo(rev[j].x,rev[j].y,(rev[j].x+rev[j+1].x)/2,(rev[j].y+rev[j+1].y)/2);ctx.lineTo(rev.at(-1).x,rev.at(-1).y);ctx.closePath();
+   ctx.beginPath();smooth(left);const rev=right.reverse();ctx.lineTo(rev[0].x,rev[0].y);for(let j=1;j<rev.length-1;j++)ctx.quadraticCurveTo(rev[j].x,rev[j].y,(rev[j].x+rev[j+1].x)/2,(rev[j].y+rev[j+1].y)/2);ctx.lineTo(rev[rev.length-1].x,rev[rev.length-1].y);ctx.closePath();
    const grad=ctx.createLinearGradient(ax-12,ay-15,ex+8,ey+15);grad.addColorStop(0,'#080b12');grad.addColorStop(.28,'#30343b');grad.addColorStop(.48,'#101720');grad.addColorStop(.7,'#454b52');grad.addColorStop(1,'#080d15');ctx.fillStyle=grad;ctx.shadowColor='#0a10251c';ctx.shadowBlur=3;ctx.shadowOffsetY=4;ctx.fill();ctx.shadowBlur=0;ctx.shadowOffsetY=0;
    ctx.beginPath();smooth(shine);ctx.strokeStyle=i%3===0?'#d3d9de80':'#abb5bc38';ctx.lineWidth=i%3===0?.65:.35;ctx.stroke();
   }
@@ -125,11 +125,25 @@
 
  function pointer(e){if(reduce||(e.pointerType==='touch'&&!touchActive))return;pointerIsTouch=e.pointerType==='touch';pointerClientX=e.clientX;pointerClientY=e.clientY;active=true;wake();}
 
+ // Native touch fallback also runs on Pointer Events browsers: scrolling may cancel
+ // a pointer stream, while passive touchmove still supplies finger coordinates.
+ const followFinger=e=>{if(reduce||!inView||!e.touches||!e.touches.length)return;
+  if(e.touches.length>1){touchActive=false;active=false;return}
+  const finger=e.touches[0];touchActive=true;pointerIsTouch=true;
+  pointerClientX=finger.clientX;pointerClientY=finger.clientY;active=true;wake();
+ };
+ window.addEventListener('touchstart',followFinger,{passive:true});
+ window.addEventListener('touchmove',followFinger,{passive:true});
+ const endFinger=e=>{if(e.touches&&e.touches.length){followFinger(e);return}touchActive=false;active=false;tx=ty=0;wake()};
+ window.addEventListener('touchend',endFinger,{passive:true});window.addEventListener('touchcancel',endFinger,{passive:true});
  window.addEventListener('pointermove',pointer,{passive:true});
  window.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'&&inView){touchActive=true;pointer(e)}},{passive:true});
  const releaseTouch=e=>{if(e.pointerType==='touch'){touchActive=false;active=false;tx=ty=0;wake()}};
  window.addEventListener('pointerup',releaseTouch,{passive:true});window.addEventListener('pointercancel',releaseTouch,{passive:true});window.addEventListener('blur',()=>{active=false;tx=ty=0},{passive:true});
  document.addEventListener('visibilitychange',()=>{last=0;if(!document.hidden)wake()});
  if('IntersectionObserver' in window){new IntersectionObserver(entries=>{inView=entries[0].isIntersecting;if(inView){last=0;wake()}else{ctx.clearRect(0,0,w,h)}},{rootMargin:'80px'}).observe(root)}
- window.addEventListener('resize',size,{passive:true});new ResizeObserver(size).observe(stage);size();
+ window.addEventListener('resize',size,{passive:true});
+ if(typeof ResizeObserver!=='undefined')new ResizeObserver(size).observe(stage);
+ window.addEventListener('orientationchange',()=>{setTimeout(size,160)},{passive:true});
+ window.addEventListener('pageshow',()=>{last=0;size();wake()},{passive:true});size();
 })();
