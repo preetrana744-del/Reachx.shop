@@ -1,13 +1,13 @@
 (()=>{
  const root=document.getElementById('reachx-collaborate');if(!root)return;
  const stage=root.querySelector('.rx-collaborate__stage'),canvas=root.querySelector('canvas'),ctx=canvas.getContext('2d'),button=root.querySelector('.rx-collaborate__button');if(!ctx)return;
- const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,coarse=matchMedia('(pointer:coarse)').matches;
  const N=24,M=30,chains=Array.from({length:N},(_,i)=>({phase:i*2.399,points:Array.from({length:M},()=>({x:0,y:0,vx:0,vy:0})),path:[]}));
- let w=700,h=440,dpr=1,ready=false,px=110,py=112,vx=0,vy=0,tx=110,ty=112,active=false,dragging=false,living=!reduce,clock=0,last=0,raf=0,inView=true,demoAt=-1,press=0,pulse=0,meshMotion=0,stableAngle=.8;
- function size(){w=stage.clientWidth;h=stage.clientHeight;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);ready=false;wake()}
+ let w=700,h=440,dpr=1,ready=false,px=110,py=112,vx=0,vy=0,tx=110,ty=112,active=false,dragging=false,living=!reduce,clock=0,last=0,raf=0,inView=true,demoAt=-1,press=0,pulse=0,meshMotion=0,stableAngle=.8,pointerClientX=0,pointerClientY=0,touchActive=false,pointerIsTouch=false;
+ function size(){w=window.innerWidth;h=window.innerHeight;canvas.style.width=w+'px';canvas.style.height=h+'px';dpr=Math.min(devicePixelRatio||1,coarse?1.25:2);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);ready=false;wake()}
  function smooth(points){if(!points.length)return;ctx.moveTo(points[0].x,points[0].y);for(let j=1;j<points.length-1;j++)ctx.quadraticCurveTo(points[j].x,points[j].y,(points[j].x+points[j+1].x)/2,(points[j].y+points[j+1].y)/2);ctx.lineTo(points.at(-1).x,points.at(-1).y)}
  function paint(){meshMotion=0;
-  ctx.clearRect(0,0,w,h);const cx=w/2,cy=h/2,half=button.offsetWidth/2,rad=32,dist=Math.hypot(px,py),angle=dist>3?(stableAngle=Math.atan2(py,px)):stableAngle,nx=-Math.sin(angle),ny=Math.cos(angle),energy=Math.min(Math.hypot(vx,vy)/12,1);
+  const box=stage.getBoundingClientRect();canvas.style.left=(-box.left)+'px';canvas.style.top=(-box.top)+'px';ctx.clearRect(0,0,w,h);const cx=box.left+stage.clientWidth/2,cy=box.top+stage.clientHeight/2,half=button.offsetWidth/2,rad=32,dist=Math.hypot(px,py),angle=dist>3?(stableAngle=Math.atan2(py,px)):stableAngle,nx=-Math.sin(angle),ny=Math.cos(angle),energy=Math.min(Math.hypot(vx,vy)/12,1);
   ctx.save();
   for(let i=0;i<N;i++){
    const c=chains[i],u=(i-(N-1)/2)/((N-1)/2),a=angle+u*1.18+Math.sin(i*2.3)*.085;
@@ -17,7 +17,7 @@
    const p=c.points;
    for(let j=0;j<M;j++){
     const t=j/(M-1),envelope=Math.pow(Math.sin(Math.PI*t),.85),wave=Math.sin(t*8-clock*(1.2+i*.037)+c.phase),wave2=Math.sin(t*17+clock*(1.8+i*.019)+c.phase*.7);
-    const spread=(u*(34+dist*.18)+Math.sin(i*1.7)*14)*Math.sin(Math.PI*t)*(1-t);
+    const spread=(u*(34+Math.min(dist,320)*.18)+Math.sin(i*1.7)*14)*Math.sin(Math.PI*t)*(1-t);
     const wriggle=living?(wave*(7+energy*8)+wave2*2.5)*envelope:0;
     const qx=ax+dx*t+perpX*(spread+wriggle),qy=ay+dy*t+perpY*(spread+wriggle);
     if(!ready||reduce){p[j].x=qx;p[j].y=qy;p[j].vx=p[j].vy=0}
@@ -106,27 +106,30 @@
   const body=ctx.createLinearGradient(cx,cy-38,cx,cy+40);body.addColorStop(0,'#768294');body.addColorStop(.12,'#303949');body.addColorStop(.32,'#0b1019');body.addColorStop(.75,'#080b11');body.addColorStop(1,'#354051');ctx.fillStyle=body;ctx.shadowColor='#11172d30';ctx.shadowBlur=17;ctx.shadowOffsetY=9;ctx.fill();ctx.shadowBlur=0;ctx.shadowOffsetY=0;
   // A small liquid collar binds the tips, with the familiar hand cursor above it.
   ctx.save();ctx.translate(cx+px,cy+py);ctx.rotate(angle);ctx.beginPath();ctx.ellipse(-4,0,11,3.8+Math.sin(clock*2)*.4,0,0,Math.PI*2);ctx.fillStyle='#141d29';ctx.fill();ctx.restore();
-  if(active){
+  if(active&&!pointerIsTouch){
   ctx.save();ctx.translate(cx+px,cy+py);ctx.rotate(-.18);ctx.beginPath();ctx.moveTo(-4,10);ctx.lineTo(-10,0);ctx.quadraticCurveTo(-12,-5,-8,-5);ctx.lineTo(-3,0);ctx.lineTo(-3,-14);ctx.quadraticCurveTo(0,-19,3,-14);ctx.lineTo(3,-5);ctx.quadraticCurveTo(7,-9,9,-4);ctx.quadraticCurveTo(14,-7,15,0);ctx.quadraticCurveTo(19,-1,18,5);ctx.lineTo(13,17);ctx.lineTo(0,17);ctx.closePath();ctx.fillStyle='#fafbf9';ctx.fill();ctx.strokeStyle='#1b2430';ctx.lineWidth=1.7;ctx.stroke();ctx.restore();
   }
   ctx.restore();
-  button.style.transform=`perspective(650px) translate(${px*.025}px,${py*.025}px) rotateX(${-py*.018}deg) rotateY(${px*.018}deg) scale(${1-press*.055})`;
-  button.style.background=`radial-gradient(ellipse at ${38+px*.12}% ${12+py*.07}%,#4c586a 0%,#202936 23%,#080c14 63%,#151e2a 100%)`;
+  const tiltX=Math.max(-320,Math.min(320,px)),tiltY=Math.max(-200,Math.min(200,py));
+  button.style.transform=`perspective(650px) translate(${tiltX*.025}px,${tiltY*.025}px) rotateX(${-tiltY*.018}deg) rotateY(${tiltX*.018}deg) scale(${1-press*.055})`;
+  button.style.background=`radial-gradient(ellipse at ${38+tiltX*.12}% ${12+tiltY*.07}%,#4c586a 0%,#202936 23%,#080c14 63%,#151e2a 100%)`;
  }
- function tick(t){raf=0;if(document.hidden||!inView){last=0;return}const dt=Math.min((t-last)/16.67||1,2);last=t;if(living)clock+=dt/60;
+ function tick(t){raf=0;if(document.hidden||!inView){last=0;return}if(coarse&&last&&t-last<30){wake();return}const dt=Math.min((t-last)/16.67||1,2);last=t;if(living)clock+=dt/60;
 
   let xx=tx,yy=ty;if(!active&&living){xx=Math.min(w*.26,150)*Math.sin(clock*.44+.7);yy=42+Math.sin(clock*.72)*18}
-  yy=Math.max(-h/2+22,Math.min(h/2-22,yy));const cap=Math.min(w*.44,320),len=Math.hypot(xx,yy);if(len>cap){xx*=cap/len;yy*=cap/len}
+  if(active){const box=stage.getBoundingClientRect();xx=pointerClientX-box.left-stage.clientWidth/2;yy=pointerClientY-box.top-stage.clientHeight/2;}
   const follow=1-Math.exp(-dt*.24);const oldX=px,oldY=py;px+=(xx-px)*follow;py+=(yy-py)*follow;vx=(px-oldX)*.35;vy=(py-oldY)*.35;px+=vx*.12;py+=vy*.12;press*=Math.pow(.89,dt);paint();
   const unsettled=meshMotion>.03;if(living||demoAt>=0||Math.hypot(xx-px,yy-py)+Math.hypot(vx,vy)>.08||unsettled||press>.001)wake();else last=0;
  }
  function wake(){if(!raf&&!document.hidden&&inView)raf=requestAnimationFrame(tick)}
 
- function pointer(e){if(e.pointerType==='touch'||reduce)return;const r=stage.getBoundingClientRect(),x=e.clientX-r.left-w/2,y=e.clientY-r.top-h/2;
-  if(Math.abs(x)>w/2+100||Math.abs(y)>h/2+80){active=false;tx=ty=0;return}tx=x;ty=y;active=true;wake();
- }
- window.addEventListener('pointermove',pointer,{passive:true});window.addEventListener('blur',()=>{active=false;tx=ty=0},{passive:true});
+ function pointer(e){if(reduce||(e.pointerType==='touch'&&!touchActive))return;pointerIsTouch=e.pointerType==='touch';pointerClientX=e.clientX;pointerClientY=e.clientY;active=true;wake();}
+
+ window.addEventListener('pointermove',pointer,{passive:true});
+ window.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'&&inView){touchActive=true;pointer(e)}},{passive:true});
+ const releaseTouch=e=>{if(e.pointerType==='touch'){touchActive=false;active=false;tx=ty=0;wake()}};
+ window.addEventListener('pointerup',releaseTouch,{passive:true});window.addEventListener('pointercancel',releaseTouch,{passive:true});window.addEventListener('blur',()=>{active=false;tx=ty=0},{passive:true});
  document.addEventListener('visibilitychange',()=>{last=0;if(!document.hidden)wake()});
- if('IntersectionObserver' in window){new IntersectionObserver(entries=>{inView=entries[0].isIntersecting;if(inView){last=0;wake()}},{rootMargin:'80px'}).observe(root)}
- new ResizeObserver(size).observe(stage);size();
+ if('IntersectionObserver' in window){new IntersectionObserver(entries=>{inView=entries[0].isIntersecting;if(inView){last=0;wake()}else{ctx.clearRect(0,0,w,h)}},{rootMargin:'80px'}).observe(root)}
+ window.addEventListener('resize',size,{passive:true});new ResizeObserver(size).observe(stage);size();
 })();
