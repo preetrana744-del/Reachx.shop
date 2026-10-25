@@ -1508,7 +1508,59 @@ input::placeholder,textarea::placeholder{color:#746E63;opacity:1}
 :focus-visible{outline-color:#866019!important}
 .contact strong[style]{color:#795719!important}.modalBody,.priceQualifier{color:#625D54}.modalTitle,.modalItem{color:#25231F}.contactInfo a{text-decoration-color:rgba(121,87,25,.4)}
 .planHeading{color:#795719;opacity:1}.priceQualifier{white-space:normal;overflow-wrap:anywhere}
-</style><link rel="stylesheet" href="/reachx-collaborate.css?v=20261025"><script defer src="/reachx-collaborate.js?v=20261025-perf3"></script></head>
+</style><link rel="stylesheet" href="/reachx-collaborate.css?v=20261025"><script defer src="/reachx-collaborate.js?v=20261025-perf3"></script><style id="reachx-responsive-polish">
+
+/* Responsive UI polish: stable scrolling, balanced spacing and readable touch UI. */
+section,.hero{min-height:100vh;min-height:100svh;scroll-margin-top:88px}
+.site>section>div{min-width:0;max-width:100%}
+.content h2,.contact h2{line-height:.94}
+.service,.planCard,.glass{border-radius:18px}
+.service .serviceTitle{line-height:1.5;overflow-wrap:anywhere}
+.modalCard{overscroll-behavior-y:contain;scrollbar-width:thin}
+.modalClose{min-width:44px;min-height:44px}
+.modalTitle{line-height:1.08;overflow-wrap:anywhere}
+.btn{justify-content:center;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+a:focus-visible,button:focus-visible{outline:2px solid #866019;outline-offset:4px}
+@media(max-width:900px){
+  .two{gap:40px}
+  .topbar{background:rgba(247,245,240,.96);border-bottom:1px solid rgba(112,85,35,.12)}
+  .chapterNav{right:3px;gap:2px}
+  .chapterNav button,.chapterNav button.active{position:relative;width:24px;height:44px;background:transparent;box-shadow:none;border-radius:0}
+  .chapterNav button::after{content:"";position:absolute;width:4px;height:4px;left:10px;top:20px;border-radius:8px;background:rgba(99,80,42,.35)}
+  .chapterNav button.active::after{height:18px;top:13px;background:#A87C24}
+}
+@media(max-width:620px){
+  section{padding:96px max(28px,7vw) 72px}
+  .hero{padding-top:108px;padding-bottom:64px}
+  .hero .heroWordmark{font-size:clamp(64px,21vw,130px);margin:28px 0;line-height:.82}
+  .kicker,.eyebrow{letter-spacing:.18em;line-height:1.8}
+  .lead{font-size:clamp(16px,4.2vw,20px);line-height:1.65}
+  .content h2{font-size:clamp(42px,11.5vw,68px);letter-spacing:-.06em;margin:18px 0 24px}
+  .contact h2{font-size:clamp(42px,12vw,74px)}
+  .content p{font-size:15px;line-height:1.8}
+  .serviceGrid,.planGrid{gap:14px;margin-top:26px}
+  .service,.planCard{padding:22px}
+  .planSummary{min-height:0}
+  .actions{gap:10px;margin-top:26px}
+  .actions .btn{flex:1 1 160px;min-height:48px;letter-spacing:.08em}
+  .microTrust{line-height:1.9;letter-spacing:.08em}
+  .contactInfo{gap:14px;font-size:13px;line-height:1.8}
+  .seoDirectory{padding:36px max(28px,7vw)}
+  footer{padding:36px max(28px,7vw) calc(100px + env(safe-area-inset-bottom));line-height:1.8}
+}
+@media(hover:none),(pointer:coarse){
+  .btn:hover,.planCard:hover,.whatsapp:hover{transform:none}
+  .planCard,.whatsapp,.topbar{-webkit-backdrop-filter:none;backdrop-filter:none}
+  .whatsapp::before,.whatsapp::after{animation:none}
+}
+@media(orientation:landscape) and (max-height:560px){
+  .hero{padding-top:100px;padding-bottom:56px}
+}
+@media(prefers-reduced-motion:reduce){
+  section,.hero{scroll-behavior:auto}
+}
+</style>
+</head>
 <body>
 <canvas id="webgl" aria-hidden="true"></canvas>
 <!-- Replace /assets/reachx-background.gif with the user's supplied GIF/video. -->
