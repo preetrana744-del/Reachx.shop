@@ -11,5 +11,5 @@
 body{-webkit-user-select:none;user-select:none}
 a,button,canvas{-webkit-touch-callout:none}
 input,textarea,select,[contenteditable]:not([contenteditable="false"]){-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
-.rx-collaborate canvas{contain:strict}
+.rx-collaborate canvas{contain:none}
 @media(pointer:coarse){.rx-collaborate__button{will-change:auto}}
