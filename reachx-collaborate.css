@@ -6,3 +6,10 @@
 .rx-collaborate__button:focus-visible{outline:3px solid #866019!important;outline-offset:8px}
 @media(max-width:620px){.rx-collaborate{height:190px}.rx-collaborate__stage{height:330px}.rx-collaborate__button{width:198px;margin-left:-99px;height:58px;margin-top:-29px;font-size:18px}}
 @media(prefers-reduced-motion:reduce){.rx-collaborate__button{will-change:auto}}
+
+/* Avoid accidental long-press highlights while preserving editable controls. */
+body{-webkit-user-select:none;user-select:none}
+a,button,canvas{-webkit-touch-callout:none}
+input,textarea,select,[contenteditable]:not([contenteditable="false"]){-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+.rx-collaborate canvas{contain:strict}
+@media(pointer:coarse){.rx-collaborate__button{will-change:auto}}
