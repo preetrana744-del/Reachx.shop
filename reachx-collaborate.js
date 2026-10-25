@@ -4,10 +4,10 @@
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,coarse=matchMedia('(pointer:coarse)').matches;
  const N=coarse?12:24,M=30,chains=Array.from({length:N},(_,i)=>({phase:i*2.399,points:Array.from({length:M},()=>({x:0,y:0,vx:0,vy:0})),path:[]}));
  let w=700,h=440,dpr=1,ready=false,px=110,py=112,vx=0,vy=0,tx=110,ty=112,active=false,dragging=false,living=!reduce,clock=0,last=0,raf=0,inView=true,demoAt=-1,press=0,pulse=0,meshMotion=0,stableAngle=.8,pointerClientX=0,pointerClientY=0,touchActive=false,pointerIsTouch=false;
- function size(){const nextW=Math.max(1,stage.clientWidth),nextH=Math.max(1,stage.clientHeight);if(ready&&w===nextW&&h===nextH)return;w=nextW;h=nextH;canvas.style.width=w+'px';canvas.style.height=h+'px';dpr=Math.min(devicePixelRatio||1,coarse?1:1.5);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);ready=false;wake()}
+ function size(){const nextW=Math.max(1,window.innerWidth),nextH=Math.max(1,window.innerHeight);if(ready&&w===nextW&&h===nextH)return;w=nextW;h=nextH;canvas.style.width=w+'px';canvas.style.height=h+'px';dpr=Math.min(devicePixelRatio||1,coarse?.75:1.5);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);ready=false;wake()}
  function smooth(points){if(!points.length)return;ctx.moveTo(points[0].x,points[0].y);for(let j=1;j<points.length-1;j++)ctx.quadraticCurveTo(points[j].x,points[j].y,(points[j].x+points[j+1].x)/2,(points[j].y+points[j+1].y)/2);ctx.lineTo(points[points.length-1].x,points[points.length-1].y)}
  function paint(box){meshMotion=0;
-  ctx.clearRect(0,0,w,h);const cx=w/2,cy=h/2,half=button.offsetWidth/2,rad=32,dist=Math.hypot(px,py),angle=dist>3?(stableAngle=Math.atan2(py,px)):stableAngle,nx=-Math.sin(angle),ny=Math.cos(angle),energy=Math.min(Math.hypot(vx,vy)/12,1);
+  canvas.style.left=(-box.left)+'px';canvas.style.top=(-box.top)+'px';ctx.clearRect(0,0,w,h);const cx=box.left+stage.clientWidth/2,cy=box.top+stage.clientHeight/2,half=button.offsetWidth/2,rad=32,dist=Math.hypot(px,py),angle=dist>3?(stableAngle=Math.atan2(py,px)):stableAngle,nx=-Math.sin(angle),ny=Math.cos(angle),energy=Math.min(Math.hypot(vx,vy)/12,1);
   ctx.save();
   for(let i=0;i<N;i++){
    const c=chains[i],u=(i-(N-1)/2)/((N-1)/2),a=angle+u*1.18+Math.sin(i*2.3)*.085;
@@ -118,8 +118,8 @@
 
   let xx=tx,yy=ty;if(!active&&living){xx=Math.min(w*.26,150)*Math.sin(clock*.44+.7);yy=42+Math.sin(clock*.72)*18}
   const box=stage.getBoundingClientRect();
-  if(active){xx=pointerClientX-box.left-w/2;yy=pointerClientY-box.top-h/2;}
-  xx=Math.max(-Math.max(0,w/2-24),Math.min(Math.max(0,w/2-24),xx));yy=Math.max(-Math.max(0,h/2-24),Math.min(Math.max(0,h/2-24),yy));
+  if(active){xx=pointerClientX-box.left-stage.clientWidth/2;yy=pointerClientY-box.top-stage.clientHeight/2;}
+
   const follow=1-Math.exp(-dt*.24);const oldX=px,oldY=py;px+=(xx-px)*follow;py+=(yy-py)*follow;vx=(px-oldX)*.35;vy=(py-oldY)*.35;px+=vx*.12;py+=vy*.12;press*=Math.pow(.89,dt);paint(box);
   const unsettled=meshMotion>.03;if(living||demoAt>=0||Math.hypot(xx-px,yy-py)+Math.hypot(vx,vy)>.08||unsettled||press>.001)wake();else last=0;
  }
@@ -134,12 +134,12 @@
   const finger=e.touches[0];touchActive=true;pointerIsTouch=true;
   pointerClientX=finger.clientX;pointerClientY=finger.clientY;active=true;wake();
  };
- root.addEventListener('touchstart',followFinger,{passive:true});
+ window.addEventListener('touchstart',followFinger,{passive:true});
  window.addEventListener('touchmove',e=>{if(touchActive)followFinger(e)},{passive:true});
  const endFinger=e=>{if(e.touches&&e.touches.length){followFinger(e);return}touchActive=false;active=false;tx=ty=0;wake()};
  window.addEventListener('touchend',endFinger,{passive:true});window.addEventListener('touchcancel',endFinger,{passive:true});
  window.addEventListener('pointermove',pointer,{passive:true});
- window.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'&&inView&&root.contains(e.target)){touchActive=true;pointer(e)}},{passive:true});
+ window.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'&&inView){touchActive=true;pointer(e)}},{passive:true});
  const releaseTouch=e=>{if(e.pointerType==='touch'){touchActive=false;active=false;tx=ty=0;wake()}};
  window.addEventListener('pointerup',releaseTouch,{passive:true});window.addEventListener('pointercancel',releaseTouch,{passive:true});window.addEventListener('blur',()=>{active=false;tx=ty=0},{passive:true});
  document.addEventListener('visibilitychange',()=>{last=0;if(!document.hidden)wake()});
