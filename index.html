@@ -1508,7 +1508,7 @@ input::placeholder,textarea::placeholder{color:#746E63;opacity:1}
 :focus-visible{outline-color:#866019!important}
 .contact strong[style]{color:#795719!important}.modalBody,.priceQualifier{color:#625D54}.modalTitle,.modalItem{color:#25231F}.contactInfo a{text-decoration-color:rgba(121,87,25,.4)}
 .planHeading{color:#795719;opacity:1}.priceQualifier{white-space:normal;overflow-wrap:anywhere}
-</style><link rel="stylesheet" href="/reachx-collaborate.css?v=20261025-touch5"><script defer src="/reachx-collaborate.js?v=20261025-touch5"></script><style id="reachx-responsive-polish">
+</style><link rel="stylesheet" href="/reachx-collaborate.css?v=20261026-light"><script defer src="/reachx-collaborate.js?v=20261026-light"></script><style id="reachx-responsive-polish">
 
 /* Responsive UI polish: stable scrolling, balanced spacing and readable touch UI. */
 section,.hero{min-height:100vh;min-height:100svh;scroll-margin-top:88px}
@@ -1560,14 +1560,14 @@ a:focus-visible,button:focus-visible{outline:2px solid #866019;outline-offset:4p
   section,.hero{scroll-behavior:auto}
 }
 </style>
-</head>
+<link rel="stylesheet" href="/reachx-ui.css?v=20261026"><script defer src="/reachx-ui.js?v=20261026"></script></head>
 <body>
 <canvas id="webgl" aria-hidden="true"></canvas>
 <!-- Replace /assets/reachx-background.gif with the user's supplied GIF/video. -->
 <video id="bgMedia" muted playsinline loop preload="metadata" aria-hidden="true"></video>
 <div id="vignette"></div><div id="grain"></div>
 
-<div class="topbar"><div class="brand">REACHX.SHOP</div><button class="btn topLoginBtn" id="topLoginBtn" type="button">LOGIN</button></div>
+<div class="topbar"><a class="brand" href="/" aria-label="ReachX home">REACHX.SHOP</a><button class="rx-menu-toggle" aria-expanded="false" aria-controls="rx-menu" type="button">MENU</button><nav class="rx-menu" id="rx-menu" aria-label="Main navigation"><a href="/#phase1">Services &amp; plans</a><a href="/work.html">Work</a><a href="/about.html">About</a><a href="/contact.html">Contact</a></nav><button class="btn topLoginBtn" id="topLoginBtn" type="button">LOGIN</button></div>
 <div class="kineticLogoLabel" id="kineticLogoLabel"><span id="logoWord">FLASH</span></div>
 
 <div class="chapterNav" aria-label="Page phases">
@@ -1800,8 +1800,8 @@ a:focus-visible,button:focus-visible{outline:2px solid #866019;outline-offset:4p
     <div class="planAuthPanel" id="planAuthPanel" hidden>
       <div class="planAuthTitle">Login required to purchase</div>
       <form class="authForm" id="planAuthForm">
-        <input id="authEmail" name="email" type="email" placeholder="Email address" autocomplete="email" required>
-        <input id="authPassword" name="password" type="password" placeholder="Password" autocomplete="current-password" minlength="6" required>
+        <input id="authEmail" aria-label="Email address" name="email" type="email" placeholder="Email address" autocomplete="email" required>
+        <input id="authPassword" aria-label="Password" name="password" type="password" placeholder="Password" autocomplete="current-password" minlength="6" required>
         <div class="authButtons">
           <button class="btn primary" id="authLoginBtn" type="submit">Login</button>
           <button class="btn" id="authSignupBtn" type="button">Sign up</button>
@@ -1824,8 +1824,8 @@ a:focus-visible,button:focus-visible{outline:2px solid #866019;outline-offset:4p
     <div class="modalTitle" id="authModalTitle">Login / Sign up</div>
     <div class="accountInfo" id="accountInfo">Login to your Reach X account to continue.</div>
     <form class="authForm" id="topAuthForm">
-      <input id="topAuthEmail" name="email" type="email" placeholder="Email address" autocomplete="email" required>
-      <input id="topAuthPassword" name="password" type="password" placeholder="Password" autocomplete="current-password" minlength="6" required>
+      <input id="topAuthEmail" aria-label="Email address" name="email" type="email" placeholder="Email address" autocomplete="email" required>
+      <input id="topAuthPassword" aria-label="Password" name="password" type="password" placeholder="Password" autocomplete="current-password" minlength="6" required>
       <div class="authButtons">
         <button class="btn primary" type="submit">Login</button>
         <button class="btn" id="topAuthSignupBtn" type="button">Sign up</button>
@@ -1972,8 +1972,27 @@ a:focus-visible,button:focus-visible{outline:2px solid #866019;outline-offset:4p
 // Reach X authentication — login at top + login gate for plan purchases only.
 const SUPABASE_URL='https://eiijmxudxdzmfnzomlfy.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_-3wTUAa9uSGztsOpD9evRA_EqXSC-M8';
-if (!window.supabase) await new Promise((resolve,reject)=>{const sdk=document.getElementById('auth-sdk');sdk.addEventListener('load',resolve,{once:true});sdk.addEventListener('error',()=>reject(new Error('Account service unavailable')),{once:true});});
-const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+// Account loading must never block public navigation or plan previews.
+const accountReady = new Promise((resolve) => {
+  const sdk=document.getElementById('auth-sdk');
+  let done=false;
+  const finish=()=>{if(done)return;done=true;clearTimeout(timer);
+    try { resolve(window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY) : null); }
+    catch { resolve(null); }
+  };
+  const timer=setTimeout(finish,8000);
+  if(window.supabase) finish();
+  else {sdk.addEventListener('load',finish,{once:true});sdk.addEventListener('error',finish,{once:true});}
+});
+const unavailable={message:'Account service is unavailable. Please try again later or contact ReachX.'};
+const supabaseClient={auth:{
+  onAuthStateChange(callback){accountReady.then(client=>{if(client)client.auth.onAuthStateChange(callback);});},
+  async getSession(){const client=await accountReady;return client?client.auth.getSession():{data:{session:null},error:unavailable};},
+  ...Object.fromEntries(['signInWithPassword','signUp','signInWithOAuth','signOut'].map(method=>[method,async(...args)=>{
+    try {const client=await accountReady;return client?await client.auth[method](...args):{data:{},error:unavailable};}
+    catch {return {data:{},error:unavailable};}
+  }]))
+}};
 
 const topLoginBtn=document.getElementById('topLoginBtn');
 const authModal=document.getElementById('authModal');
@@ -2487,7 +2506,7 @@ function showAnimationFallback(){
 if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
   showAnimationFallback();
 } else {
-  const startVisuals=()=>import('/reachx-animation.js?v=mobile-particles-v7').then(module=>module.startAnimation(showAnimationFallback)).catch(showAnimationFallback);
+  const startVisuals=()=>import('/reachx-animation.js?v=responsive-light-v8').then(module=>module.startAnimation(showAnimationFallback)).catch(showAnimationFallback);
   if ('requestIdleCallback' in window) requestIdleCallback(startVisuals,{timeout:2500});
   else setTimeout(startVisuals,1000);
 }
