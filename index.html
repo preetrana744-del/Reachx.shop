@@ -1508,7 +1508,7 @@ input::placeholder,textarea::placeholder{color:#746E63;opacity:1}
 :focus-visible{outline-color:#866019!important}
 .contact strong[style]{color:#795719!important}.modalBody,.priceQualifier{color:#625D54}.modalTitle,.modalItem{color:#25231F}.contactInfo a{text-decoration-color:rgba(121,87,25,.4)}
 .planHeading{color:#795719;opacity:1}.priceQualifier{white-space:normal;overflow-wrap:anywhere}
-</style><link rel="stylesheet" href="/reachx-collaborate.css?v=20261026-light"><script defer src="/reachx-collaborate.js?v=20261026-light"></script><style id="reachx-responsive-polish">
+</style><link rel="stylesheet" href="/reachx-collaborate.css?v=20261026-restored"><script defer src="/reachx-collaborate.js?v=20261026-restored"></script><style id="reachx-responsive-polish">
 
 /* Responsive UI polish: stable scrolling, balanced spacing and readable touch UI. */
 section,.hero{min-height:100vh;min-height:100svh;scroll-margin-top:88px}
@@ -1560,7 +1560,7 @@ a:focus-visible,button:focus-visible{outline:2px solid #866019;outline-offset:4p
   section,.hero{scroll-behavior:auto}
 }
 </style>
-<link rel="stylesheet" href="/reachx-ui.css?v=20261026"><script defer src="/reachx-ui.js?v=20261026"></script></head>
+<link rel="stylesheet" href="/reachx-ui.css?v=20261026-restored"><script defer src="/reachx-ui.js?v=20261026"></script></head>
 <body>
 <canvas id="webgl" aria-hidden="true"></canvas>
 <!-- Replace /assets/reachx-background.gif with the user's supplied GIF/video. -->
@@ -2506,7 +2506,7 @@ function showAnimationFallback(){
 if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
   showAnimationFallback();
 } else {
-  const startVisuals=()=>import('/reachx-animation.js?v=responsive-light-v8').then(module=>module.startAnimation(showAnimationFallback)).catch(showAnimationFallback);
+  const startVisuals=()=>import('/reachx-animation.js?v=restored-effects-v9').then(module=>module.startAnimation(showAnimationFallback)).catch(showAnimationFallback);
   if ('requestIdleCallback' in window) requestIdleCallback(startVisuals,{timeout:2500});
   else setTimeout(startVisuals,1000);
 }
