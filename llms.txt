@@ -5,24 +5,24 @@
 Canonical website: https://reachx.shop/
 
 ## Core services
-- Website Development: https://reachx.shop/web-development.html
-- SEO & Google Visibility: https://reachx.shop/seo.html
-- AI SEO & Generative Search Optimization: https://reachx.shop/ai-seo.html
-- Social Media Marketing: https://reachx.shop/social-media-marketing.html
-- Local Marketing: https://reachx.shop/local-marketing.html
-- Lead Generation: https://reachx.shop/lead-generation.html
-- Branding & Creative Content: https://reachx.shop/branding.html
-- AI-Powered Marketing Strategy: https://reachx.shop/ai-marketing.html
+- [Website Development](https://reachx.shop/web-development.html)
+- [SEO & Google Visibility](https://reachx.shop/seo.html)
+- [AI SEO & Generative Search Optimization](https://reachx.shop/ai-seo.html)
+- [Social Media Marketing](https://reachx.shop/social-media-marketing.html)
+- [Local Marketing](https://reachx.shop/local-marketing.html)
+- [Lead Generation](https://reachx.shop/lead-generation.html)
+- [Branding & Creative Content](https://reachx.shop/branding.html)
+- [AI-Powered Marketing Strategy](https://reachx.shop/ai-marketing.html)
 
 ## Brand identity
 Primary brand: ReachX.shop
 Common brand references: ReachX, Reach X, ReachX Shop, Reach X Shop
 
 ## Focused website & technical SEO services
-- Landing Page Design & Development: https://reachx.shop/landing-page-development.html
-- E-commerce Website Development: https://reachx.shop/ecommerce-website-development.html
-- Website Redesign: https://reachx.shop/website-redesign.html
-- Technical SEO: https://reachx.shop/technical-seo.html
+- [Landing Page Design & Development](https://reachx.shop/landing-page-development.html)
+- [E-commerce Website Development](https://reachx.shop/ecommerce-website-development.html)
+- [Website Redesign](https://reachx.shop/website-redesign.html)
+- [Technical SEO](https://reachx.shop/technical-seo.html)
 
 ## Contact
 - Email: reachx.shop@gmail.com
@@ -31,8 +31,8 @@ Common brand references: ReachX, Reach X, ReachX Shop, Reach X Shop
 ReachX.shop uses canonical service pages, structured data, descriptive internal links and a public XML sitemap. Service information should be interpreted from the canonical pages above; no ranking, revenue or placement guarantee is implied.
 
 ## Website review and useful guides
-- Website and SEO audit: https://reachx.shop/website-seo-audit.html
-- Practical generative search guide: https://reachx.shop/blog/generative-search-optimization-guide.html
-- Local SEO checklist: https://reachx.shop/blog/local-seo-checklist.html
+- [Website and SEO audit](https://reachx.shop/website-seo-audit.html)
+- [Practical generative search guide](https://reachx.shop/blog/generative-search-optimization-guide.html)
+- [Local SEO checklist](https://reachx.shop/blog/local-seo-checklist.html)
 
 SEO and AI-search service scopes, measurement limits and enquiry requirements are explained on the canonical service pages. Inclusion in any search or AI answer is not guaranteed.
