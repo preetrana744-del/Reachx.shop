@@ -7,7 +7,7 @@
  function size(){const nextW=Math.max(1,window.innerWidth),nextH=Math.max(1,window.innerHeight);if(ready&&w===nextW&&h===nextH)return;w=nextW;h=nextH;canvas.style.width=w+'px';canvas.style.height=h+'px';dpr=Math.min(devicePixelRatio||1,coarse?.75:1.5);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);ready=false;wake()}
  function smooth(points){if(!points.length)return;ctx.moveTo(points[0].x,points[0].y);for(let j=1;j<points.length-1;j++)ctx.quadraticCurveTo(points[j].x,points[j].y,(points[j].x+points[j+1].x)/2,(points[j].y+points[j+1].y)/2);ctx.lineTo(points[points.length-1].x,points[points.length-1].y)}
  function paint(box){meshMotion=0;
-  canvas.style.left=(-box.left)+'px';canvas.style.top=(-box.top)+'px';ctx.clearRect(0,0,w,h);const cx=box.left+stage.clientWidth/2,cy=box.top+stage.clientHeight/2,half=button.offsetWidth/2,rad=32,dist=Math.hypot(px,py),angle=dist>3?(stableAngle=Math.atan2(py,px)):stableAngle,nx=-Math.sin(angle),ny=Math.cos(angle),energy=Math.min(Math.hypot(vx,vy)/12,1);
+  canvas.style.transform=`translate(${-box.left}px,${-box.top}px)`;ctx.clearRect(0,0,w,h);const cx=box.left+stage.clientWidth/2,cy=box.top+stage.clientHeight/2,half=button.offsetWidth/2,rad=32,dist=Math.hypot(px,py),angle=dist>3?(stableAngle=Math.atan2(py,px)):stableAngle,nx=-Math.sin(angle),ny=Math.cos(angle),energy=Math.min(Math.hypot(vx,vy)/12,1);
   ctx.save();
   for(let i=0;i<N;i++){
    const c=chains[i],u=(i-(N-1)/2)/((N-1)/2),a=angle+u*1.18+Math.sin(i*2.3)*.085;
