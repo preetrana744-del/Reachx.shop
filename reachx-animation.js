@@ -86,6 +86,8 @@ const positions=new Float32Array(count*3);
 const seeds=new Float32Array(count);
 const colors=new Float32Array(count*3);
 const base=new Float32Array(count*3);
+// Immutable geometry avoids repeating square roots and seed trigonometry each frame.
+const radialDistance=new Float64Array(count),seedSin3=new Float64Array(count),seedCos2=new Float64Array(count);
 const palette=[
   new THREE.Color(0x000000),new THREE.Color(0x000000),
   new THREE.Color(0x000000),new THREE.Color(0x000000),
@@ -105,6 +107,7 @@ for(let i=0;i<count;i++){
   const c=palette[Math.floor(Math.random()*palette.length)];
   colors[i*3]=c.r; colors[i*3+1]=c.g; colors[i*3+2]=c.b;
 }
+for(let i=0;i<count;i++){const k=i*3;radialDistance[i]=Math.sqrt(base[k]*base[k]+base[k+1]*base[k+1])+.001;seedSin3[i]=Math.sin(seeds[i]*3);seedCos2[i]=Math.cos(seeds[i]*2);}
 const geo=new THREE.BufferGeometry();
 geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
 geo.setAttribute('aSeed',new THREE.BufferAttribute(seeds,1));
@@ -503,14 +506,14 @@ function animate(t){
   const arr=geo.attributes.position.array;
   const updateField = !dynamicLowMode || (frameCounter % (frameSkip+1)===0);
   if(updateField){
+    const swirl=t*.00012 + scrollP*.9,swirlCos=Math.cos(swirl),swirlSin=Math.sin(swirl);
     for(let i=0;i<count;i++){
       const k=i*3, s=seeds[i], bx=base[k], by=base[k+1], bz=base[k+2];
-      const radial=Math.sqrt(bx*bx+by*by)+.001;
+      const radial=radialDistance[i];
       const wave=Math.sin(radial*2.3 - scrollP*22 + s + t*.0008)*.15;
-      const swirl=t*.00012 + scrollP*.9;
-      arr[k]=bx*Math.cos(swirl)-by*Math.sin(swirl) + Math.cos(s+t*.0007)*wave + velocity*18*Math.sin(s*3);
-      arr[k+1]=bx*Math.sin(swirl)+by*Math.cos(swirl) + Math.sin(s+t*.0006)*wave;
-      arr[k+2]=bz + Math.sin(radial*1.5-scrollP*18+s)*.18 + velocity*22*Math.cos(s*2);
+      arr[k]=bx*swirlCos-by*swirlSin + Math.cos(s+t*.0007)*wave + velocity*18*seedSin3[i];
+      arr[k+1]=bx*swirlSin+by*swirlCos + Math.sin(s+t*.0006)*wave;
+      arr[k+2]=bz + Math.sin(radial*1.5-scrollP*18+s)*.18 + velocity*22*seedCos2[i];
     }
     geo.attributes.position.needsUpdate=true;
   }
