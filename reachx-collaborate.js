@@ -3,6 +3,8 @@
  const stage=root.querySelector('.rx-collaborate__stage'),canvas=root.querySelector('canvas'),ctx=canvas.getContext('2d'),button=root.querySelector('.rx-collaborate__button');if(!ctx)return;
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,coarse=matchMedia('(pointer:coarse)').matches;
  const N=coarse?12:24,M=30,chains=Array.from({length:N},(_,i)=>({phase:i*2.399,points:Array.from({length:M},()=>({x:0,y:0,vx:0,vy:0})),path:[]}));
+ // Geometry factors are constant across frames; retain the same strand shape.
+ const samples=Array.from({length:M},(_,j)=>{const t=j/(M-1),sin=Math.sin(Math.PI*t);return {t,sin,envelope:Math.pow(sin,.85),taper:Math.pow(1-t,2.4)}});
  let w=700,h=440,dpr=1,ready=false,px=110,py=112,vx=0,vy=0,tx=110,ty=112,active=false,dragging=false,living=!reduce,clock=0,last=0,raf=0,inView=true,demoAt=-1,press=0,pulse=0,meshMotion=0,stableAngle=.8,pointerClientX=0,pointerClientY=0,touchActive=false,pointerIsTouch=false;
  function size(){const nextW=Math.max(1,window.innerWidth),nextH=Math.max(1,window.innerHeight);if(ready&&w===nextW&&h===nextH)return;w=nextW;h=nextH;canvas.style.width=w+'px';canvas.style.height=h+'px';dpr=Math.min(devicePixelRatio||1,coarse?.75:1.5);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);ready=false;wake()}
  function smooth(points){if(!points.length)return;ctx.moveTo(points[0].x,points[0].y);for(let j=1;j<points.length-1;j++)ctx.quadraticCurveTo(points[j].x,points[j].y,(points[j].x+points[j+1].x)/2,(points[j].y+points[j+1].y)/2);ctx.lineTo(points[points.length-1].x,points[points.length-1].y)}
@@ -16,8 +18,8 @@
    const dx=ex-ax,dy=ey-ay,len=Math.hypot(dx,dy),perpX=-dy/Math.max(len,1),perpY=dx/Math.max(len,1);
    const p=c.points;
    for(let j=0;j<M;j++){
-    const t=j/(M-1),envelope=Math.pow(Math.sin(Math.PI*t),.85),wave=Math.sin(t*8-clock*(1.2+i*.037)+c.phase),wave2=Math.sin(t*17+clock*(1.8+i*.019)+c.phase*.7);
-    const spread=(u*(34+Math.min(dist,320)*.18)+Math.sin(i*1.7)*14)*Math.sin(Math.PI*t)*(1-t);
+    const {t,sin,envelope}=samples[j],wave=Math.sin(t*8-clock*(1.2+i*.037)+c.phase),wave2=Math.sin(t*17+clock*(1.8+i*.019)+c.phase*.7);
+    const spread=(u*(34+Math.min(dist,320)*.18)+Math.sin(i*1.7)*14)*sin*(1-t);
     const wriggle=living?(wave*(7+energy*8)+wave2*2.5)*envelope:0;
     const qx=ax+dx*t+perpX*(spread+wriggle),qy=ay+dy*t+perpY*(spread+wriggle);
     if(!ready||reduce){p[j].x=qx;p[j].y=qy;p[j].vx=p[j].vy=0}
@@ -28,9 +30,9 @@
    for(let pass=0;pass<2;pass++)for(let j=1;j<M-1;j++){p[j].x+=(p[j-1].x+p[j+1].x-2*p[j].x)*.12;p[j].y+=(p[j-1].y+p[j+1].y-2*p[j].y)*.12}
    const left=[],right=[],shine=[];
    for(let j=0;j<M;j++){
-    const t=j/(M-1),prev=p[Math.max(j-1,0)],next=p[Math.min(j+1,M-1)],dx1=next.x-prev.x,dy1=next.y-prev.y,l=Math.max(Math.hypot(dx1,dy1),.01),nnx=-dy1/l,nny=dx1/l;
+    const {t,sin,taper}=samples[j],prev=p[Math.max(j-1,0)],next=p[Math.min(j+1,M-1)],dx1=next.x-prev.x,dy1=next.y-prev.y,l=Math.max(Math.hypot(dx1,dy1),.01),nnx=-dy1/l,nny=dx1/l;
     const travel=living?Math.pow(Math.max(0,Math.sin(t*11-clock*2.1+c.phase)),12):0;
-    const core=i%6===0;const thickness=(core?2.2: .42)+Math.pow(1-t,2.4)*(core?10:3.7)+travel*(core?4.5:1.1)*Math.sin(Math.PI*t);const width=thickness*(1+press*.5);
+    const core=i%6===0;const thickness=(core?2.2: .42)+taper*(core?10:3.7)+travel*(core?4.5:1.1)*sin;const width=thickness*(1+press*.5);
     const side=i%2?1:-1;
     const spineNode=7+(i*5)%13;
     const delta=j-spineNode;
@@ -84,10 +86,10 @@
     points.push({x,y});
    }
    for(let j=0;j<points.length;j++){
-    const t=j/29,prev=points[Math.max(0,j-1)],next=points[Math.min(29,j+1)];
+    const {t,sin,taper}=samples[j],prev=points[Math.max(0,j-1)],next=points[Math.min(29,j+1)];
     const dx=next.x-prev.x,dy=next.y-prev.y,l=Math.max(Math.hypot(dx,dy),.01),nnx=-dy/l,nny=dx/l;
     const travel=living?Math.pow(Math.max(0,Math.sin(t*11-clock*2.1+i*2.399)),12):0;
-    const width=(.48+Math.pow(1-t,2.4)*rootWidth+travel*(i%4===0?4.5:1.1)*Math.sin(Math.PI*t))*(1+press*.5);
+    const width=(.48+taper*rootWidth+travel*(i%4===0?4.5:1.1)*sin)*(1+press*.5);
     left.push({x:points[j].x+nnx*width,y:points[j].y+nny*width});
     right.push({x:points[j].x-nnx*width,y:points[j].y-nny*width});
     highlight.push({x:points[j].x+nnx*width*.45,y:points[j].y+nny*width*.45});
